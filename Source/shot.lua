@@ -16,7 +16,7 @@ end
 function Shot:draw()
     gfx.setLineWidth(2)
     gfx.setColor(gfx.kColorBlack)
-    
+
     if self.dir.x > 0 and self.dir.y > 0 or self.dir.x < 0 and self.dir.y < 0 then
         gfx.drawLine(1, 1, self.width - 1, self.height - 1)
     else

@@ -31,10 +31,10 @@ function Player:init(x, y)
 end
 
 function Player:collisionResponse(other)
-	-- if other:isa(Coin) or (other:isa(Enemy) and other.crushed == true) then
-	-- 	return "overlap"
-	-- end
-	
+	if other:isa(Button) then
+		return "overlap"
+	end
+
 	return "slide"
 end
 
@@ -119,13 +119,15 @@ function Player:update()
 
     self.onGround = false
     for i, c in ipairs(collisions) do
-        if c.normal.y < 0 then	-- feet hit
-            self.velocity.y = 0
-            self.onGround = true
-        end
+        if c.type == gfx.sprite.kCollisionTypeSlide then
+            if c.normal.y < 0 then	-- feet hit
+                self.velocity.y = 0
+                self.onGround = true
+            end
 
-        if c.normal.x ~= 0 then	-- sideways hit. stop moving
-            self.velocity.x = 0
+            if c.normal.x ~= 0 then	-- sideways hit. stop moving
+                self.velocity.x = 0
+            end
         end
     end
 end

@@ -590,6 +590,7 @@
     "project": "portal.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "Source/levels/level17.tmj",
         "tiles.tsx",
         "Source/levels/level3.tmj",
         "Source/levels/level4.tmj",
@@ -600,8 +601,7 @@
         "Source/levels/level9.tmj",
         "Source/levels/level10.tmj",
         "Source/levels/level11.tmj",
-        "Source/levels/level12.tmj",
-        "Source/levels/level14.tmj"
+        "Source/levels/level12.tmj"
     ],
     "tileset.embedInMap": false,
     "tileset.lastUsedFormat": "tsx",

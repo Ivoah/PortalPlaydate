@@ -11,10 +11,22 @@ function Level:init(id)
     self.tilemap = gfx.tilemap.new()
     self.tilemap:setImageTable(imageTable)
     self.tilemap:setTiles(map.layers[1].data, map.width)
-    
+
     self:setCenter(0, 0)
     self:setSize(400, 240)
     self:setZIndex(-1)
+
+    self.entities = {}
+    for r=1, map.height do
+        for c=1, map.width do
+            t = self.tilemap:getTileAtPosition(c, r)
+            if t == 5 then -- button
+                local btn = Button(r, c)
+                btn:add()
+                table.insert(self.entities, btn)
+            end
+        end
+    end
 
     self.hasElevator = false
     for i, t in ipairs(map.properties) do
@@ -45,6 +57,7 @@ end
 
 function Level:draw()
     self.tilemap:draw(0, 0)
+
     gfx.setColor(gfx.kColorBlack)
     gfx.fillRect(360, 0, 40, 400)
     gfx.setColor(gfx.kColorWhite)
@@ -66,6 +79,10 @@ end
 
 function Level:remove()
     Level.super.remove(self)
+
+    for i, entity in ipairs(self.entities) do
+        entity:remove()
+    end
 
     -- self.exitFloor:remove()
     for i, sprite in ipairs(self.mapCollisionSprites) do

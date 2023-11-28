@@ -5,6 +5,8 @@ import "CoreLibs/timer"
 import "CoreLibs/ui"
 
 import "level"
+import "button"
+import "shot"
 import "player"
 
 local gfx <const> = playdate.graphics
