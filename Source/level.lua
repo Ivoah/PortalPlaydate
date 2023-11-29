@@ -50,9 +50,6 @@ function Level:init(id)
             break
         end
     end
-
-    -- self.exitFloor = gfx.sprite.addEmptyCollisionSprite(360, self.exit*20, 40, 20)
-    -- self.exitFloor:setGroups({1})
 end
 
 function Level:draw()
@@ -80,12 +77,6 @@ end
 function Level:remove()
     Level.super.remove(self)
 
-    for i, entity in ipairs(self.entities) do
-        entity:remove()
-    end
-
-    -- self.exitFloor:remove()
-    for i, sprite in ipairs(self.mapCollisionSprites) do
-        sprite:remove()
-    end
+    gfx.sprite.removeSprites(self.entities)
+    gfx.sprite.removeSprites(self.mapCollisionSprites)
 end

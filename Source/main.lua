@@ -7,20 +7,15 @@ import "CoreLibs/ui"
 import "level"
 import "button"
 import "shot"
+import "portal"
 import "player"
 
 local gfx <const> = playdate.graphics
 
--- gfx.setFont(gfx.font.new("font/Nontendo-Bold"))
-
-local map_width <const> = 18
-local map_height <const> = 12
-
--- local player
 local currentLevel
 local level
 local player
-function loadLevel(id)
+local function loadLevel(id)
     currentLevel = id
     if level ~= nil then level:remove() end
     level = Level(id)

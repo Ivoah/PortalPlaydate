@@ -15,8 +15,8 @@ function Player:init(x, y)
     self:setCollidesWithGroups({1})
     self:moveTo(x, y)
 
-    self.bluePortal = nil
-    self.orangePortal = nil
+    self.lastPortal = nil
+    self.lastLastPortal = nil
 
     self.onGround = true
 
@@ -55,6 +55,14 @@ function Player:shootPortal(dir, color)
     if nHits > 0 then
         print(hitX, hitY)
         printTable(hits[1].normal)
+        if hits[1].normal.x < 0 then hitX += 1 end
+        if hits[1].normal.y < 0 then hitY += 1 end
+
+        if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
+        if self.lastPortal ~= nil then self.lastPortal.fast = false end
+        self.lastLastPortal = self.lastPortal
+        self.lastPortal = Portal(hitX, hitY, hits[1].normal)
+        self.lastPortal:add()
     end
 end
 
@@ -130,4 +138,11 @@ function Player:update()
             end
         end
     end
+end
+
+function Player:remove()
+    Player.super.remove(self)
+
+    if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
+    if self.lastPortal ~= nil then self.lastPortal:remove() end
 end
