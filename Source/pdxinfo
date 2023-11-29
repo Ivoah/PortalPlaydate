@@ -1,0 +1,7 @@
+name=Portal Prelude
+author=Noah Rosamilia
+description=Welcome to Aperture Laboratories! Long before GLaDOS ever ran the facility, step into the shoes of a test subject and test the Aperture Science Handheld Portal Device (ASHPD) for yourself! Test your way through 38 devious test chambers using Portals, in addition to many other intriguing gameplay elements such as plasma balls and electric fields.
+bundleID=net.ivoah.portalprelude
+version=0.1
+buildNumber=1
+imagePath=images/launcher
