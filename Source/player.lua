@@ -67,7 +67,7 @@ function Player:shootPortal(dir, color)
 end
 
 function Player:draw()
-    local gunFrame = ((playdate.getCrankPosition() + 360/16 + 90)%360)//(360/8)
+    local gunFrame = ((playdate.getCrankPosition() + 45/2 + 90)%360)//45
 
     self.playerFrames:drawImage(self.currentFrame//2 + 1, 0, 0, self.left and gfx.kImageFlippedX or gfx.kImageUnflipped)
     self.gun:drawImage(gunFrame + 1, 0, 0)
@@ -84,10 +84,10 @@ function Player:update()
     if change ~= 0 then self:markDirty() end
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
-        self:shootPortal(Vector.newPolar(1, playdate.getCrankPosition() + 90))
+        self:shootPortal(Vector.newPolar(1, (playdate.getCrankPosition() + 45/2 + 90)//45*45))
     end
     if playdate.buttonJustPressed(playdate.kButtonB) then
-        self:shootPortal(Vector.newPolar(1, playdate.getCrankPosition() + 90))
+        self:shootPortal(Vector.newPolar(1, (playdate.getCrankPosition() + 45/2 + 90)//45*45))
     end
     if (CHEAT_FLYING or self.onGround) and playdate.buttonIsPressed(playdate.kButtonUp) then
         self.velocity.y = -6
