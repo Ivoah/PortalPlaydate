@@ -24,26 +24,28 @@ function Player:init(x, y)
     self.currentFrame = 1
     self.gun = gfx.imagetable.new("images/gun")
 
+    self.ghost = gfx.sprite.new(self.playerFrames[1])
+    self.ghost:setCenter(0, 0)
+
     self.left = false
 
     self.velocity = Vector.new(0, 0)
-    self.position = Point.new(self.x, self.y)
 end
 
 function Player:collisionResponse(other)
-	if other:isa(Button) then
-		return "overlap"
+	if other:isa(Button) or other:isa(Portal) then
+		return gfx.sprite.kCollisionTypeOverlap
 	end
 
-	return "slide"
+	return gfx.sprite.kCollisionTypeSlide
 end
 
-function Player:shootPortal(dir, color)
-    local from = self.position + Vector.new(self:getSize())/2
+function Player:shootPortal(dir, bluePortal)
+    local from = Point.new(self:getPosition()) + Vector.new(self:getSize())/2
     local target = from + dir*500
 
     local bullet = gfx.sprite.new()
-    bullet:moveTo(from.x, from.y)
+    bullet:moveTo(from)
     bullet:setCollideRect(0, 0, 1, 1)
     bullet:setCollidesWithGroups({1})
     bullet:add()
@@ -53,16 +55,25 @@ function Player:shootPortal(dir, color)
     Shot(from, Point.new(hitX, hitY)):add()
 
     if nHits > 0 then
-        print(hitX, hitY)
-        printTable(hits[1].normal)
         if hits[1].normal.x < 0 then hitX += 1 end
         if hits[1].normal.y < 0 then hitY += 1 end
 
-        if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
-        if self.lastPortal ~= nil then self.lastPortal.fast = false end
-        self.lastLastPortal = self.lastPortal
-        self.lastPortal = Portal(hitX, hitY, hits[1].normal)
-        self.lastPortal:add()
+        -- if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
+        -- if self.lastPortal ~= nil then self.lastPortal.fast = false end
+        -- self.lastLastPortal = self.lastPortal
+        -- self.lastPortal = Portal(hitX, hitY, hits[1].normal)
+        -- self.lastPortal:add()
+        local newPortal = Portal(hitX, hitY, hits[1].normal)
+        newPortal:add()
+        if bluePortal then
+            if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
+            newPortal.fast = true
+            self.lastLastPortal = newPortal
+        else
+            if self.lastPortal ~= nil then self.lastPortal:remove() end
+            newPortal.fast = false
+            self.lastPortal = newPortal
+        end
     end
 end
 
@@ -84,10 +95,10 @@ function Player:update()
     if change ~= 0 then self:markDirty() end
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
-        self:shootPortal(Vector.newPolar(1, (playdate.getCrankPosition() + 45/2 + 90)//45*45))
+        self:shootPortal(Vector.newPolar(1, (playdate.getCrankPosition() + 45/2 + 90)//45*45), true)
     end
     if playdate.buttonJustPressed(playdate.kButtonB) then
-        self:shootPortal(Vector.newPolar(1, (playdate.getCrankPosition() + 45/2 + 90)//45*45))
+        self:shootPortal(Vector.newPolar(1, (playdate.getCrankPosition() + 45/2 + 90)//45*45), false)
     end
     if (CHEAT_FLYING or self.onGround) and playdate.buttonIsPressed(playdate.kButtonUp) then
         self.velocity.y = -6
@@ -97,6 +108,7 @@ function Player:update()
     end
     if playdate.buttonIsPressed(playdate.kButtonLeft) then
         self.left = true
+        self.ghost:setImageFlip(gfx.kImageFlippedX)
         self.velocity.x -= 2
         self.currentFrame += 1
         self.currentFrame %= self.playerFrames:getLength()*2
@@ -104,6 +116,7 @@ function Player:update()
     end
     if playdate.buttonIsPressed(playdate.kButtonRight) then
         self.left = false
+        self.ghost:setImageFlip(gfx.kImageUnflipped)
         self.velocity.x += 2
         self.currentFrame += 1
         self.currentFrame %= self.playerFrames:getLength()*2
@@ -118,15 +131,35 @@ function Player:update()
     self.velocity.x = math.max(-MAX_X_VELOCITY, math.min(self.velocity.x, MAX_X_VELOCITY))
     self.velocity.y = math.max(-MAX_Y_VELOCITY, math.min(self.velocity.y, MAX_Y_VELOCITY))
 
-    self.position += self.velocity
+    local targetPosition = Point.new(self:getPosition()) + self.velocity
 
-    self.position.x = math.max(self.position.x, 0)
+    targetPosition.x = math.max(targetPosition.x, 0)
 
-    local collisions, nCollisions
-    self.position.x, self.position.y, collisions, nCollisions = self:moveWithCollisions(self.position)
+    local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
 
     self.onGround = false
+    self.exitingPortal = nil
+    self:setCollidesWithGroups({1})
+    self.ghost:remove()
     for i, c in ipairs(collisions) do
+        if c.other:isa(Portal) then
+            self:setCollidesWithGroups({2})
+
+            local otherPortal = c.other == self.lastPortal and self.lastLastPortal or self.lastPortal
+
+            local exitPoint = Point.new(
+                otherPortal.x - math.sign(otherPortal.normal.x)*math.sign(c.other.normal.x)*(self.x - c.other.x),
+                otherPortal.y + math.sign(otherPortal.normal.y)*math.sign(c.other.normal.y)*(self.y - c.other.y)
+            )
+
+            if c.other:swallows(Point.new(self:getPosition()) + Vector.new(self:getSize())/2) then
+                self:moveTo(exitPoint)
+            end
+
+            self.ghost:moveTo(exitPoint)
+            self.ghost:add()
+        end
+
         if c.type == gfx.sprite.kCollisionTypeSlide then
             if c.normal.y < 0 then	-- feet hit
                 self.velocity.y = 0

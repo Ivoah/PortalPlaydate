@@ -4,6 +4,8 @@ import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/ui"
 
+import "math"
+
 import "level"
 import "button"
 import "shot"
@@ -54,7 +56,7 @@ function playdate.update()
         gfx.sprite.update()
     end
 
-    if player.position.x > 360 then
+    if player.x > 360 then
         loadLevel(math.min(currentLevel + 1, 31))
     end
 end

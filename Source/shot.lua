@@ -8,7 +8,7 @@ function Shot:init(from, to)
 
     self.dir = to - from
     local center = from + Vector.new(self.dir.x, self.dir.y)/2
-    self:moveTo(center.x, center.y)
+    self:moveTo(center)
 
     self:setSize(math.abs(self.dir.x) + 2, math.abs(self.dir.y) + 2)
 end

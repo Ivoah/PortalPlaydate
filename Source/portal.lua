@@ -24,9 +24,40 @@ function Portal:init(x, y, normal)
         self:setCenter(1, 0.5)
     end
 
+    self:setZIndex(2)
     self:moveTo(x, y)
-
     self:setCollideRect(0, 0, self:getSize())
+    self:setGroups({1, 2})
+
+    self.sides = {}
+end
+
+function Portal:add()
+    Portal.super.add(self)
+
+    if self.normal.x ~= 0 then
+        self.sides = {
+            gfx.sprite.addEmptyCollisionSprite(self.x - 4 - self.normal.x*4, self.y - 5*4, 2*4, 4),
+            gfx.sprite.addEmptyCollisionSprite(self.x - 4 - self.normal.x*4, self.y + 4*4, 2*4, 4)
+        }
+    else
+        self.sides = {
+            gfx.sprite.addEmptyCollisionSprite(self.x - 5*4, self.y - 4 - self.normal.y*4, 4, 2*4),
+            gfx.sprite.addEmptyCollisionSprite(self.x + 4*4, self.y - 4 - self.normal.y*4, 4, 2*4)
+        }
+    end
+
+    for i, s in ipairs(self.sides) do
+        s:setGroups({1, 2})
+    end
+end
+
+function Portal:swallows(point)
+    print(point)
+    return (self.normal.x < 0 and point.x > self.x) or
+           (self.normal.x > 0 and point.x < self.x) or
+           (self.normal.y < 0 and point.y > self.y) or
+           (self.normal.y > 0 and point.y < self.y)
 end
 
 function Portal:draw()
@@ -58,4 +89,10 @@ end
 function Portal:update()
     self.offset += self.fast and 1 or 0.5
     self:markDirty()
+end
+
+function Portal:remove()
+    Portal.super.remove(self)
+
+    gfx.sprite.removeSprites(self.sides)
 end
