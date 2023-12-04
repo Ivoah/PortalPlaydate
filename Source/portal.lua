@@ -11,15 +11,19 @@ function Portal:init(x, y, normal)
     self.normal = normal
 
     if normal.y < 0 then
+        self.angle = 90
         self:setSize(8*4, 2*4)
         self:setCenter(0.5, 0)
     elseif normal.y > 0 then
+        self.angle = 270
         self:setSize(8*4, 2*4)
         self:setCenter(0.5, 1)
     elseif normal.x < 0 then
+        self.angle = 180
         self:setSize(2*4, 8*4)
         self:setCenter(0, 0.5)
     elseif normal.x > 0 then
+        self.angle = 0
         self:setSize(2*4, 8*4)
         self:setCenter(1, 0.5)
     end
@@ -50,14 +54,6 @@ function Portal:add()
     for i, s in ipairs(self.sides) do
         s:setGroups({1, 2})
     end
-end
-
-function Portal:swallows(point)
-    print(point)
-    return (self.normal.x < 0 and point.x > self.x) or
-           (self.normal.x > 0 and point.x < self.x) or
-           (self.normal.y < 0 and point.y > self.y) or
-           (self.normal.y > 0 and point.y < self.y)
 end
 
 function Portal:draw()

@@ -4,7 +4,7 @@ import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/ui"
 
-import "math"
+import "utils"
 
 import "level"
 import "button"

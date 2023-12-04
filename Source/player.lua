@@ -3,7 +3,7 @@ local Vector <const> = playdate.geometry.vector2D
 local Point <const> = playdate.geometry.point
 
 local MAX_X_VELOCITY <const> = 5
-local MAX_Y_VELOCITY <const> = 10
+local MAX_Y_VELOCITY <const> = 15
 
 class("Player").extends(gfx.sprite)
 
@@ -85,7 +85,7 @@ function Player:draw()
 end
 
 function Player:update()
-    self.velocity.y += 1
+    self.velocity.y = math.min(self.velocity.y + 1, MAX_Y_VELOCITY)
 
     if self.onGround then
         self.velocity.x *= 0.6
@@ -109,7 +109,7 @@ function Player:update()
     if playdate.buttonIsPressed(playdate.kButtonLeft) then
         self.left = true
         self.ghost:setImageFlip(gfx.kImageFlippedX)
-        self.velocity.x -= 2
+        self.velocity.x = math.max(self.velocity.x - 2, -MAX_X_VELOCITY)
         self.currentFrame += 1
         self.currentFrame %= self.playerFrames:getLength()*2
         self:markDirty()
@@ -117,7 +117,7 @@ function Player:update()
     if playdate.buttonIsPressed(playdate.kButtonRight) then
         self.left = false
         self.ghost:setImageFlip(gfx.kImageUnflipped)
-        self.velocity.x += 2
+        self.velocity.x = math.min(self.velocity.x + 2, MAX_X_VELOCITY)
         self.currentFrame += 1
         self.currentFrame %= self.playerFrames:getLength()*2
         self:markDirty()
@@ -128,9 +128,6 @@ function Player:update()
         self:markDirty()
     end
 
-    self.velocity.x = math.max(-MAX_X_VELOCITY, math.min(self.velocity.x, MAX_X_VELOCITY))
-    self.velocity.y = math.max(-MAX_Y_VELOCITY, math.min(self.velocity.y, MAX_Y_VELOCITY))
-
     local targetPosition = Point.new(self:getPosition()) + self.velocity
 
     targetPosition.x = math.max(targetPosition.x, 0)
@@ -138,37 +135,34 @@ function Player:update()
     local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
 
     self.onGround = false
-    self.exitingPortal = nil
+    local inPortal = false
     self:setCollidesWithGroups({1})
     self.ghost:remove()
     for i, c in ipairs(collisions) do
         if c.other:isa(Portal) then
+            inPortal = true
             self:setCollidesWithGroups({2})
+            local centerOffset = Vector.new(self:getSize())/2
+            local center = Point.new(self:getPosition()) + centerOffset
 
-            local otherPortal = c.other == self.lastPortal and self.lastLastPortal or self.lastPortal
+            local entryPortal = c.other
+            local exitPortal = entryPortal == self.lastPortal and self.lastLastPortal or self.lastPortal
 
-            local exitPoint = Point.new(
-                otherPortal.x - math.sign(otherPortal.normal.x)*math.sign(c.other.normal.x)*(self.x - c.other.x),
-                otherPortal.y + math.sign(otherPortal.normal.y)*math.sign(c.other.normal.y)*(self.y - c.other.y)
-            )
+            local offset = Vector.new(center.x - entryPortal.x, center.y - entryPortal.y)
+            local transform = playdate.geometry.affineTransform.new():rotatedBy(entryPortal.angle - exitPortal.angle - 180)
+            local exitPoint = Point.new(exitPortal:getPosition()) + offset*transform
 
-            if c.other:swallows(Point.new(self:getPosition()) + Vector.new(self:getSize())/2) then
-                self:moveTo(exitPoint)
+            if entryPortal:getBoundsRect():containsPoint(center) then
+                self:moveTo(exitPoint - centerOffset)
+                self.velocity *= transform
             end
 
-            self.ghost:moveTo(exitPoint)
+            self.ghost:moveTo(exitPoint - centerOffset)
             self.ghost:add()
-        end
-
-        if c.type == gfx.sprite.kCollisionTypeSlide then
-            if c.normal.y < 0 then	-- feet hit
-                self.velocity.y = 0
-                self.onGround = true
-            end
-
-            if c.normal.x ~= 0 then	-- sideways hit. stop moving
-                self.velocity.x = 0
-            end
+        elseif c.type == gfx.sprite.kCollisionTypeSlide then
+            if c.normal.y ~= 0 and not inPortal then self.velocity.y = 0 end
+            if c.normal.x ~= 0 and not inPortal then self.velocity.x = 0 end
+            if c.normal.y < 0 then self.onGround = true end
         end
     end
 end
