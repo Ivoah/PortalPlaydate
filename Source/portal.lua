@@ -9,21 +9,22 @@ function Portal:init(x, y, normal)
     self.offset = 0
     self.fast = true
     self.normal = normal
+    self.transform = playdate.geometry.affineTransform.new()
 
     if normal.y < 0 then
-        self.angle = 90
+        self.transform:rotate(90)
+        self.transform:scale(1, -1)
         self:setSize(8*4, 2*4)
         self:setCenter(0.5, 0)
     elseif normal.y > 0 then
-        self.angle = 270
+        self.transform:rotate(90)
         self:setSize(8*4, 2*4)
         self:setCenter(0.5, 1)
     elseif normal.x < 0 then
-        self.angle = 180
+        self.transform:scale(-1, 1)
         self:setSize(2*4, 8*4)
         self:setCenter(0, 0.5)
     elseif normal.x > 0 then
-        self.angle = 0
         self:setSize(2*4, 8*4)
         self:setCenter(1, 0.5)
     end

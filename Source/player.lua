@@ -64,7 +64,6 @@ function Player:shootPortal(dir, bluePortal)
         -- self.lastPortal = Portal(hitX, hitY, hits[1].normal)
         -- self.lastPortal:add()
         local newPortal = Portal(hitX, hitY, hits[1].normal)
-        newPortal:add()
         if bluePortal then
             if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
             newPortal.fast = true
@@ -74,6 +73,7 @@ function Player:shootPortal(dir, bluePortal)
             newPortal.fast = false
             self.lastPortal = newPortal
         end
+        newPortal:add()
     end
 end
 
@@ -149,7 +149,10 @@ function Player:update()
             local exitPortal = entryPortal == self.lastPortal and self.lastLastPortal or self.lastPortal
 
             local offset = Vector.new(center.x - entryPortal.x, center.y - entryPortal.y)
-            local transform = playdate.geometry.affineTransform.new():rotatedBy(entryPortal.angle - exitPortal.angle - 180)
+            local transform = entryPortal.transform:copy()
+            transform:invert()
+            transform:scale(-1, 1)
+            transform:concat(exitPortal.transform)
             local exitPoint = Point.new(exitPortal:getPosition()) + offset*transform
 
             if entryPortal:getBoundsRect():containsPoint(center) then
