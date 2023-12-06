@@ -139,7 +139,7 @@ function Player:update()
     self:setCollidesWithGroups({1})
     self.ghost:remove()
     for _, c in ipairs(collisions) do
-        if c.other:isa(Portal) then
+        if c.other:isa(Portal) and self.lastPortal ~= nil and self.lastLastPortal ~= nil then
             inPortal = true
             self:setCollidesWithGroups({2})
             local centerOffset = Vector.new(self:getSize())/2
@@ -163,6 +163,8 @@ function Player:update()
             self.ghost:moveTo(exitPoint - centerOffset)
             self.ghost:add()
         elseif c.type == gfx.sprite.kCollisionTypeSlide then
+            if c.normal.y ~= 0 and not inPortal then self.velocity.y = 0 end
+            if c.normal.x ~= 0 and not inPortal then self.velocity.x = 0 end
             if c.normal.y < 0 then self.onGround = true end
         end
     end
