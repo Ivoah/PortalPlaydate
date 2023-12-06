@@ -1,5 +1,9 @@
 local gfx <const> = playdate.graphics
 local Vector <const> = playdate.geometry.vector2D
+local Point <const> = playdate.geometry.point
+
+local PORTAL_DEPTH <const> = 5*4
+local PORTAL_HEIGHT <const> = 8*4
 
 class("Portal").extends(gfx.sprite)
 
@@ -11,21 +15,22 @@ function Portal:init(x, y, normal)
     self.normal = normal
     self.transform = playdate.geometry.affineTransform.new()
 
+    local aabb = playdate.geometry.rect.new(0, 0, PORTAL_DEPTH, PORTAL_HEIGHT)
     if normal.y < 0 then
         self.transform:rotate(90)
         self.transform:scale(1, -1)
-        self:setSize(8*4, 2*4)
+        self:setSize(PORTAL_HEIGHT, PORTAL_DEPTH)
         self:setCenter(0.5, 0)
     elseif normal.y > 0 then
         self.transform:rotate(90)
-        self:setSize(8*4, 2*4)
+        self:setSize(PORTAL_HEIGHT, PORTAL_DEPTH)
         self:setCenter(0.5, 1)
     elseif normal.x < 0 then
         self.transform:scale(-1, 1)
-        self:setSize(2*4, 8*4)
+        self:setSize(PORTAL_DEPTH, PORTAL_HEIGHT)
         self:setCenter(0, 0.5)
     elseif normal.x > 0 then
-        self:setSize(2*4, 8*4)
+        self:setSize(PORTAL_DEPTH, PORTAL_HEIGHT)
         self:setCenter(1, 0.5)
     end
 
@@ -42,13 +47,13 @@ function Portal:add()
 
     if self.normal.x ~= 0 then
         self.sides = {
-            gfx.sprite.addEmptyCollisionSprite(self.x - 4 - self.normal.x*4, self.y - 5*4, 2*4, 4),
-            gfx.sprite.addEmptyCollisionSprite(self.x - 4 - self.normal.x*4, self.y + 4*4, 2*4, 4)
+            gfx.sprite.addEmptyCollisionSprite(self.x - PORTAL_DEPTH/2 - self.normal.x*PORTAL_DEPTH/2, self.y - (PORTAL_HEIGHT/2 + 4), PORTAL_DEPTH, 4),
+            gfx.sprite.addEmptyCollisionSprite(self.x - PORTAL_DEPTH/2 - self.normal.x*PORTAL_DEPTH/2, self.y + PORTAL_HEIGHT/2, PORTAL_DEPTH, 4)
         }
     else
         self.sides = {
-            gfx.sprite.addEmptyCollisionSprite(self.x - 5*4, self.y - 4 - self.normal.y*4, 4, 2*4),
-            gfx.sprite.addEmptyCollisionSprite(self.x + 4*4, self.y - 4 - self.normal.y*4, 4, 2*4)
+            gfx.sprite.addEmptyCollisionSprite(self.x - (PORTAL_HEIGHT/2 + 4), self.y - PORTAL_DEPTH/2 - self.normal.y*PORTAL_DEPTH/2, 4, PORTAL_DEPTH),
+            gfx.sprite.addEmptyCollisionSprite(self.x + PORTAL_HEIGHT/2, self.y - PORTAL_DEPTH/2 - self.normal.y*PORTAL_DEPTH/2, 4, PORTAL_DEPTH)
         }
     end
 
@@ -57,7 +62,18 @@ function Portal:add()
     end
 end
 
+function Portal:contains(point)
+    return (self.transform*(point - Point.new(self:getPosition()))).x <= 0
+end
+
 function Portal:draw()
+    local offset
+    if self.normal.x > 0 or self.normal.y > 0 then
+        offset = PORTAL_DEPTH - 2*4
+    else
+        offset = 0
+    end
+
     if self.normal.x ~= 0 then
         for r=0, 7 do
             for c=0, 1 do
@@ -66,7 +82,7 @@ function Portal:draw()
                 else
                     gfx.setColor(gfx.kColorWhite)
                 end
-                gfx.fillRect(c*4, r*4, 4, 4)
+                gfx.fillRect(c*4 + offset, r*4, 4, 4)
             end
         end
     else
@@ -77,7 +93,7 @@ function Portal:draw()
                 else
                     gfx.setColor(gfx.kColorWhite)
                 end
-                gfx.fillRect(c*4, r*4, 4, 4)
+                gfx.fillRect(c*4, r*4 + offset, 4, 4)
             end
         end
     end

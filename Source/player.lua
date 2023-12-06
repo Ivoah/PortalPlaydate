@@ -132,15 +132,15 @@ function Player:update()
 
     targetPosition.x = math.max(targetPosition.x, 0)
 
-    local startX, startY = self.x, self.y
-    local endX, endY, collisions, _ = self:moveWithCollisions(targetPosition)
-    self.velocity = Vector.new(endX - startX, endY - startY)
+    local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
 
     self.onGround = false
+    local inPortal = false
     self:setCollidesWithGroups({1})
     self.ghost:remove()
     for _, c in ipairs(collisions) do
         if c.other:isa(Portal) then
+            inPortal = true
             self:setCollidesWithGroups({2})
             local centerOffset = Vector.new(self:getSize())/2
             local center = Point.new(self:getPosition()) + centerOffset
@@ -155,7 +155,7 @@ function Player:update()
             transform:concat(exitPortal.transform)
             local exitPoint = Point.new(exitPortal:getPosition()) + offset*transform
 
-            if entryPortal:getBoundsRect():containsPoint(center) then
+            if entryPortal:contains(center) then
                 self:moveTo(exitPoint - centerOffset)
                 self.velocity *= transform
             end
