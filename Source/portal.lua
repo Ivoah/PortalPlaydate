@@ -62,10 +62,6 @@ function Portal:add()
     end
 end
 
-function Portal:contains(point)
-    return (self.transform*(point - Point.new(self:getPosition()))).x <= 0
-end
-
 function Portal:draw()
     local offset
     if self.normal.x > 0 or self.normal.y > 0 then

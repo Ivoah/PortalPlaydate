@@ -155,7 +155,7 @@ function Player:update()
             transform:concat(exitPortal.transform)
             local exitPoint = Point.new(exitPortal:getPosition()) + offset*transform
 
-            if entryPortal:contains(center) then
+            if entryPortal:getBoundsRect():containsPoint(center) then
                 self:moveTo(exitPoint - centerOffset)
                 self.velocity *= transform
             end
