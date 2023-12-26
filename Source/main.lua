@@ -14,9 +14,12 @@ import "player"
 
 local gfx <const> = playdate.graphics
 
+gfx.setFont(gfx.font.new("font/Texas"), gfx.font.kVariantNormal)
+
 local currentLevel
 local level
 local player
+local levelSprite
 local function loadLevel(id)
     currentLevel = id
     if level ~= nil then level:remove() end
@@ -26,6 +29,14 @@ local function loadLevel(id)
     if player ~= nil then player:remove() end
     player = Player(0, (level.entrance - 1)*20)
     player:add()
+
+    if levelSprite ~= nil then levelSprite:remove() end
+    levelSprite = gfx.sprite.spriteWithText("Level " .. currentLevel, 100, 10)
+    levelSprite:setImageDrawMode(gfx.kDrawModeNXOR)
+    levelSprite:setScale(2)
+    levelSprite:setCenter(0, 0)
+    levelSprite:moveTo(0, 0)
+    levelSprite:add()
 end
 
 loadLevel(1)
@@ -55,7 +66,7 @@ function playdate.update()
     else
         gfx.sprite.update()
     end
-
+    
     if player.x > 360 then
         loadLevel(math.min(currentLevel + 1, 31))
     end
