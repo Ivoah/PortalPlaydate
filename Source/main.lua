@@ -8,6 +8,7 @@ import "utils"
 
 import "level"
 import "button"
+import "door"
 import "shot"
 import "portal"
 import "player"

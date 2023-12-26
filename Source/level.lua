@@ -1,6 +1,6 @@
 local gfx <const> = playdate.graphics
 
-local imageTable = gfx.imagetable.new("images/tiles")
+imageTable = gfx.imagetable.new("images/tiles")
 
 class("Level").extends(gfx.sprite)
 
@@ -16,15 +16,25 @@ function Level:init(id)
     self:setSize(400, 240)
     self:setZIndex(-1)
 
-    self.entities = {}
-    for r=1, map.height do
-        for c=1, map.width do
-            t = self.tilemap:getTileAtPosition(c, r)
-            if t == 5 then -- button
-                local btn = Button(r, c)
-                btn:add()
-                table.insert(self.entities, btn)
+    self.objects = {}
+    if map.layers[2] then
+        for i, object in ipairs(map.layers[2].objects) do
+            local sprite
+            if object.gid == 5 then
+                sprite = Button(object.x, object.y - 20, object.properties[1].value)
+            elseif object.gid == 6 then
+                sprite = Door(object.x, object.y - 20, true)
+            elseif object.gid == 7 then
+                sprite = Door(object.x, object.y - 20, false)
             end
+
+            self.objects[object.id] = sprite
+        end
+    end
+
+    for i, object in ipairs(self.objects) do
+        if object:isa(Button) then
+            object.door = self.objects[object.door]
         end
     end
 
@@ -72,11 +82,15 @@ function Level:add()
     for i, sprite in ipairs(self.mapCollisionSprites) do
         sprite:setGroups({1})
     end
+
+    for i, object in ipairs(self.objects) do
+        object:add()
+    end
 end
 
 function Level:remove()
     Level.super.remove(self)
 
-    gfx.sprite.removeSprites(self.entities)
+    gfx.sprite.removeSprites(self.objects)
     gfx.sprite.removeSprites(self.mapCollisionSprites)
 end
