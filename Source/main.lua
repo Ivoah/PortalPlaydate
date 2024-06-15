@@ -40,7 +40,7 @@ local function loadLevel(id)
     levelSprite:add()
 end
 
-loadLevel(1)
+loadLevel(6)
 
 local menu = playdate.getSystemMenu()
 

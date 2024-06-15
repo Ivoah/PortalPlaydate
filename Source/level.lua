@@ -1,65 +1,90 @@
 local gfx <const> = playdate.graphics
 
+local WIDTH <const> = 18
+local HEIGHT <const> = 12
+
 imageTable = gfx.imagetable.new("images/tiles")
 
 class("Level").extends(gfx.sprite)
 
+function itoxy(i)
+    return (i%WIDTH)*20, math.floor(i/WIDTH)*20
+end
+
 function Level:init(id)
     Level.super.init(self)
 
-    local map = json.decodeFile("levels/level" .. id .. ".tmj")
-    self.tilemap = gfx.tilemap.new()
-    self.tilemap:setImageTable(imageTable)
-    self.tilemap:setTiles(map.layers[1].data, map.width)
+    local level = json.decodeFile("levels/level" .. id .. ".json")
 
-    self:setCenter(0, 0)
-    self:setSize(400, 240)
-    self:setZIndex(-1)
+    -- self.objects = {}
+    -- if map.layers[2] then
+    --     for i, object in ipairs(map.layers[2].objects) do
+    --         local sprite
+    --         if object.gid == 5 then
+    --             sprite = Button(object.x, object.y - 20, object.properties[1].value)
+    --         elseif object.gid == 6 then
+    --             sprite = Door(object.x, object.y - 20, true)
+    --         elseif object.gid == 7 then
+    --             sprite = Door(object.x, object.y - 20, false)
+    --         end
+
+    --         self.objects[object.id] = sprite
+    --     end
+    -- end
+
+    -- for i, object in ipairs(self.objects) do
+    --     if object:isa(Button) then
+    --         object.door = self.objects[object.door]
+    --     end
+    -- end
 
     self.objects = {}
-    if map.layers[2] then
-        for i, object in ipairs(map.layers[2].objects) do
-            local sprite
-            if object.gid == 5 then
-                sprite = Button(object.x, object.y - 20, object.properties[1].value)
-            elseif object.gid == 6 then
-                sprite = Door(object.x, object.y - 20, true)
-            elseif object.gid == 7 then
-                sprite = Door(object.x, object.y - 20, false)
-            end
+    for i, link in ipairs(level.links) do
+        local source, target
 
-            self.objects[object.id] = sprite
+        local tx, ty = itoxy(link[2])
+        if level.map[link[2] + 1] == 6 then
+            target = Door(tx, ty, true)
+        elseif level.map[link[2] + 1] == 7 then
+            target = Door(tx, ty, false)
         end
+
+        local sx, sy = itoxy(link[1])
+        if level.map[link[1] + 1] == 5 then
+            source = Button(sx, sy, target)
+        end
+
+        level.map[link[1] + 1] = 0
+        level.map[link[2] + 1] = 0
+        table.insert(self.objects, source)
+        table.insert(self.objects, target)
     end
 
-    for i, object in ipairs(self.objects) do
-        if object:isa(Button) then
-            object.door = self.objects[object.door]
-        end
-    end
+    self.hasElevator = level.hasElevator
 
-    self.hasElevator = false
-    for i, t in ipairs(map.properties) do
-        if t.name == "elevator" and t.value then
-            self.hasElevator = true
-        end
-    end
-
-    for col=map.height, 1, -1 do
-        local t = self.tilemap:getTileAtPosition(map.width, col)
-        if t == nil or t == 6 then
+    for col=HEIGHT, 1, -1 do
+        local t = level.map[(col - 1)*WIDTH + (WIDTH - 1) + 1] -- self.tilemap:getTileAtPosition(WIDTH, col)
+        if t == 0 or t == 6 then
             self.exit = col
             break
         end
     end
 
-    for col=map.height, 1, -1 do
-        local t = self.tilemap:getTileAtPosition(1, col)
-        if t == nil then
+    for col=HEIGHT, 1, -1 do
+        local t = level.map[(col - 1)*WIDTH + 1] -- self.tilemap:getTileAtPosition(1, col)
+        if t == 0 then
             self.entrance = col
             break
         end
     end
+
+    self.tilemap = gfx.tilemap.new()
+    self.tilemap:setImageTable(imageTable)
+    self.tilemap:setTiles(level.map, WIDTH)
+
+    self:setCenter(0, 0)
+    self:setSize(400, 240)
+    self:setZIndex(-1)
 end
 
 function Level:draw()

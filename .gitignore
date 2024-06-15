@@ -1,3 +1,7 @@
 .DS_Store
 *.pdx
 *.tiled-session
+.metals/
+.vscode/
+.idea/
+.bsp/
