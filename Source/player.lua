@@ -11,7 +11,7 @@ function Player:init(x, y)
     Player.super.init(self)
     self:setCenter(0, 0)
     self:setSize(20, 20)
-    self:setCollideRect(0, 0, self:getSize())
+    self:setCollideRect(1, 0, 18, 19)
     self:setCollidesWithGroups({1})
     self:moveTo(x, y)
 
