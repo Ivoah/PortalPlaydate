@@ -16,6 +16,7 @@ import "player"
 local gfx <const> = playdate.graphics
 
 gfx.setFont(gfx.font.new("font/Texas"), gfx.font.kVariantNormal)
+imageTable = gfx.imagetable.new("images/tiles")
 
 local currentLevel
 local level

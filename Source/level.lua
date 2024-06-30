@@ -3,7 +3,10 @@ local gfx <const> = playdate.graphics
 local WIDTH <const> = 18
 local HEIGHT <const> = 12
 
-imageTable = gfx.imagetable.new("images/tiles")
+local AIR = 0
+local VDOOR = 6
+local HDOOR = 7
+local BUTTON = 5
 
 class("Level").extends(gfx.sprite)
 
@@ -43,18 +46,19 @@ function Level:init(id)
         local source, target
 
         local tx, ty = itoxy(link[2])
-        if level.map[link[2] + 1] == 6 then
+        if level.map[link[2] + 1] == VDOOR then
             target = Door(tx, ty, true)
-        elseif level.map[link[2] + 1] == 7 then
+        elseif level.map[link[2] + 1] == HDOOR then
             target = Door(tx, ty, false)
         end
 
         local sx, sy = itoxy(link[1])
-        if level.map[link[1] + 1] == 5 then
+        if level.map[link[1] + 1] == BUTTON then
             source = Button(sx, sy, target)
         end
 
-        level.map[link[1] + 1] = 0
+        -- level.map[link[1] + 1] = 0
+        -- Remove the target (door) from the map so it doesn't get loaded with the rest of the tiles
         level.map[link[2] + 1] = 0
         table.insert(self.objects, source)
         table.insert(self.objects, target)
@@ -64,7 +68,7 @@ function Level:init(id)
 
     for col=HEIGHT, 1, -1 do
         local t = level.map[(col - 1)*WIDTH + (WIDTH - 1) + 1] -- self.tilemap:getTileAtPosition(WIDTH, col)
-        if t == 0 or t == 6 then
+        if t == AIR or t == VDOOR then
             self.exit = col
             break
         end
@@ -72,7 +76,7 @@ function Level:init(id)
 
     for col=HEIGHT, 1, -1 do
         local t = level.map[(col - 1)*WIDTH + 1] -- self.tilemap:getTileAtPosition(1, col)
-        if t == 0 then
+        if t == AIR then
             self.entrance = col
             break
         end

@@ -8,13 +8,7 @@ function Button:init(x, y, door)
 
     self.door = door
 
-    self.tile = gfx.sprite.new(imageTable:getImage(5, 1))
-    self.tile:setCenter(0, 0)
-    self.tile:moveTo(x, y)
-    self.tile:setCollideRect(0, 0, self.tile:getSize())
-
     self:setCenter(0, 0)
-    -- self:moveTo((col-1)*20, (row-1)*20 - 4)
     self:moveTo(x, y - 4)
 
     self:setSize(20, 8)
@@ -24,7 +18,6 @@ end
 
 function Button:add()
     Button.super.add(self)
-    self.tile:add()
 end
 
 function Button:draw()
@@ -45,5 +38,4 @@ end
 
 function Button:remove()
     Button.super.remove(this)
-    self.tile:remove()
 end
