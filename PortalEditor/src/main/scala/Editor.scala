@@ -3,14 +3,26 @@ package net.ivoah.portaleditor
 import java.awt.{AlphaComposite, Dimension, Image, MouseInfo, RenderingHints, Point, Color}
 import scala.swing.*
 import java.io.File
+import java.nio.file.Path
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.ImageIcon
+import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 import scala.swing.event.Key.Modifier
 import javax.swing.SwingUtilities
 import scala.swing.event.{MouseDragged, MouseMoved, MousePressed}
 
-class Editor(tileset: Seq[Image]) extends MainFrame {
+class Editor(projectRoot: Path) extends MainFrame {
   private val mainFrame = this
+
+  val tileset = {
+    val tilesetImage = ImageIO.read(projectRoot.resolve("images/tiles-table-20-20.png").toFile)
+    (0 until tilesetImage.getHeight by 20).flatMap { y =>
+      (0 until tilesetImage.getWidth by 20).map { x =>
+        tilesetImage.getSubimage(x, y, 20, 20)
+      }
+    }
+  }
 
   private var level: Level = Level(
     collection.mutable.Seq(
@@ -98,7 +110,7 @@ class Editor(tileset: Seq[Image]) extends MainFrame {
       new Menu("File") {
         contents ++= Seq(
           new MenuItem(Action("Load level") {
-            val chooser = new FileChooser(new File(".")) {
+            val chooser = new FileChooser(projectRoot.resolve("levels").toFile) {
               fileFilter = new FileNameExtensionFilter("JSON files", "json")
             }
             if (chooser.showOpenDialog(mainFrame) == FileChooser.Result.Approve) {
@@ -106,7 +118,7 @@ class Editor(tileset: Seq[Image]) extends MainFrame {
             }
           }),
           new MenuItem(Action("Save level") {
-            val chooser = new FileChooser(new File(".")) {
+            val chooser = new FileChooser(projectRoot.resolve("levels").toFile) {
               fileFilter = new FileNameExtensionFilter("JSON files", "json")
             }
             if (chooser.showSaveDialog(mainFrame) == FileChooser.Result.Approve) {
