@@ -12,11 +12,14 @@ function Player:init(x, y)
     self:setCenter(0, 0)
     self:setSize(20, 20)
     self:setCollideRect(1, 0, 18, 19)
-    self:setCollidesWithGroups({1})
+    self:setGroups({GROUP_PHYSICS_OBJECTS})
+    self:setCollidesWithGroups({GROUP_WALLS, GROUP_PHYSICS_OBJECTS})
     self:moveTo(x, y)
 
     self.lastPortal = nil
     self.lastLastPortal = nil
+
+    self.carrying = nil
 
     self.onGround = true
 
@@ -33,7 +36,7 @@ function Player:init(x, y)
 end
 
 function Player:collisionResponse(other)
-	if other:isa(Button) or other:isa(Portal) then
+	if other:isa(Button) or other:isa(Portal) or other:isa(Cube) then
 		return gfx.sprite.kCollisionTypeOverlap
 	end
 
@@ -47,7 +50,7 @@ function Player:shootPortal(dir, bluePortal)
     local bullet = gfx.sprite.new()
     bullet:moveTo(from)
     bullet:setCollideRect(0, 0, 1, 1)
-    bullet:setCollidesWithGroups({1})
+    bullet:setCollidesWithGroups({GROUP_WALLS})
     bullet:add()
     local hitX, hitY, hits, nHits = bullet:moveWithCollisions(target)
     bullet:remove()
@@ -103,8 +106,18 @@ function Player:update()
     if (CHEAT_FLYING or self.onGround) and playdate.buttonIsPressed(playdate.kButtonUp) then
         self.velocity.y = -6
     end
-    if playdate.buttonIsPressed(playdate.kButtonDown) then
-        -- pass
+    if playdate.buttonJustPressed(playdate.kButtonDown) then
+        if self.carrying ~= nil then
+            self.carrying.carried = false
+            self.carrying.velocity = self.velocity:copy()
+            self.carrying = nil
+        else
+            local cube = self:overlappingSprites()[1]
+            if cube ~= nil and cube:isa(Cube) then
+                self.carrying = cube
+                self.carrying.carried = true
+            end
+        end
     end
     if playdate.buttonIsPressed(playdate.kButtonLeft) then
         self.left = true
@@ -134,14 +147,24 @@ function Player:update()
 
     local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
 
+    if self.carrying ~= nil then
+        local angle = ((playdate.getCrankPosition() + 45/2 + 90)%360)//45*45
+        local x = math.sin(math.rad(angle))
+        local y = -math.cos(math.rad(angle))
+        self.carrying:moveTo(
+            self.x + self.width/2 - self.carrying.width/2 + x*self.width/2,
+            self.y + self.height/2 - self.carrying.height/2 + y*self.height/2
+        )
+    end
+
     self.onGround = false
     local inPortal = false
-    self:setCollidesWithGroups({1})
+    self:setCollidesWithGroups({GROUP_WALLS, GROUP_PHYSICS_OBJECTS})
     self.ghost:remove()
     for _, c in ipairs(collisions) do
         if c.other:isa(Portal) and self.lastPortal ~= nil and self.lastLastPortal ~= nil then
             inPortal = true
-            self:setCollidesWithGroups({2})
+            self:setCollidesWithGroups({GROUP_PORTALS})
             local centerOffset = Vector.new(self:getSize())/2
             local center = Point.new(self:getPosition()) + centerOffset
 

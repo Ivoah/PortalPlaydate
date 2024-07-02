@@ -14,7 +14,7 @@ function Door:init(x, y, vertical)
     -- self:setSize(20, 20)
 
     self:setCollideRect(0, 0, self:getSize())
-    self:setGroups({1})
+    self:setGroups({GROUP_WALLS})
 end
 
 -- function Door:draw()

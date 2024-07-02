@@ -37,7 +37,7 @@ function Portal:init(x, y, normal)
     self:setZIndex(2)
     self:moveTo(x, y)
     self:setCollideRect(0, 0, self:getSize())
-    self:setGroups({1, 2})
+    self:setGroups({GROUP_WALLS, GROUP_PORTALS})
 
     self.sides = {}
 end
@@ -58,7 +58,7 @@ function Portal:add()
     end
 
     for i, s in ipairs(self.sides) do
-        s:setGroups({1, 2})
+        s:setGroups({GROUP_WALLS, GROUP_PHYSICS_OBJECTS})
     end
 end
 

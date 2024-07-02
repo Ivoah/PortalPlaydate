@@ -12,6 +12,11 @@ import "door"
 import "shot"
 import "portal"
 import "player"
+import "cube"
+
+GROUP_WALLS = 1
+GROUP_PORTALS = 2
+GROUP_PHYSICS_OBJECTS = 3
 
 local gfx <const> = playdate.graphics
 
@@ -22,6 +27,7 @@ local currentLevel
 local level
 local player
 local levelSprite
+local cube
 local function loadLevel(id)
     currentLevel = id
     if level ~= nil then level:remove() end
@@ -39,9 +45,13 @@ local function loadLevel(id)
     levelSprite:setCenter(0, 0)
     levelSprite:moveTo(0, 0)
     levelSprite:add()
+
+    if cube ~= nil then cube:remove() end
+    cube = Cube(100, 100)
+    cube:add()
 end
 
-loadLevel(8)
+loadLevel(7)
 
 local menu = playdate.getSystemMenu()
 

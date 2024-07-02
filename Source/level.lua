@@ -111,7 +111,7 @@ function Level:add()
 
     self.mapCollisionSprites = gfx.sprite.addWallSprites(self.tilemap)
     for i, sprite in ipairs(self.mapCollisionSprites) do
-        sprite:setGroups({1})
+        sprite:setGroups({GROUP_WALLS})
     end
 
     for i, object in ipairs(self.objects) do

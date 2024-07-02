@@ -14,6 +14,8 @@ function Button:init(x, y, door)
     self:setSize(20, 8)
 
     self:setCollideRect(0, 0, 20, 4)
+
+    self:setCollidesWithGroups({GROUP_PHYSICS_OBJECTS})
 end
 
 function Button:add()
