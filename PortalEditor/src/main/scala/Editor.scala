@@ -24,25 +24,7 @@ class Editor(projectRoot: Path) extends MainFrame {
     }
   }
 
-  private var level: Level = Level(
-    collection.mutable.Seq(
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    ),
-    Seq(),
-    true,
-    ""
-  )
+  private var level: Level = Level.EmptyLevel
 
   private val palette = ComboBox(tileset.map(new ImageIcon(_)))
 
@@ -52,6 +34,9 @@ class Editor(projectRoot: Path) extends MainFrame {
     }
 
     private def itoxy(i: Int) = ((i%Level.Width)*20, i/Level.Width*20)
+    private def xytoi(x: Int, y: Int) = y/20*Level.Width + x/20
+
+    private var linkInProgress: Option[Int] = None
 
     override def paintComponent(g: Graphics2D): Unit = {
       super.paintComponent(g)
@@ -62,7 +47,7 @@ class Editor(projectRoot: Path) extends MainFrame {
       g.setPaint(Color.BLACK)
       for (x <- 0 until Level.Width; y <- 0 until Level.Height) {
         val tile = level.map(y*Level.Width + x)
-        if (tile > 0 && !(mouse.x/20 == x && mouse.y/20 == y && tile - 1 != palette.selection.index)) {
+        if (tile > 0 && !(mouse.x/20 == x && mouse.y/20 == y && tile - 1 != palette.selection.index && linkInProgress.isEmpty)) {
           g.drawImage(tileset(tile - 1), x*20, y*20, null)
         }
       }
@@ -74,17 +59,29 @@ class Editor(projectRoot: Path) extends MainFrame {
         g.drawLine(sx + 10, sy + 10, tx + 10, ty + 10)
       }
 
-      g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5))
-
-      g.drawImage(tileset(palette.selection.index), mouse.x/20*20, mouse.y/20*20, null)
+      linkInProgress match {
+        case Some(i) =>
+          val (sx, sy) = itoxy(i)
+          g.drawLine(sx + 10, sy + 10, mouse.x, mouse.y)
+        case None =>
+          g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5))
+          g.drawImage(tileset(palette.selection.index), mouse.x/20*20, mouse.y/20*20, null)
+      }
     }
 
     mouse.clicks.reactions += {
       case event: MousePressed =>
-        if (SwingUtilities.isRightMouseButton(event.peer)) {
-          level.map(event.point.y / 20 * Level.Width + event.point.x / 20) = 0
-        } else {
-          level.map(event.point.y/20*Level.Width + event.point.x/20) = palette.selection.index + 1
+        linkInProgress match {
+          case Some(i) =>
+            level.links.append((i, xytoi(event.point.x, event.point.y)))
+            linkInProgress = None
+          case _ =>
+            if (SwingUtilities.isRightMouseButton(event.peer)) {
+              // level.map(xytoi(event.point.x, event.point.y)) = 0
+              linkInProgress = Some(xytoi(event.point.x, event.point.y))
+            } else {
+              level.map(xytoi(event.point.x, event.point.y)) = palette.selection.index + 1
+            }
         }
         repaint()
     }
@@ -92,9 +89,9 @@ class Editor(projectRoot: Path) extends MainFrame {
       case _: MouseMoved => repaint()
       case event: MouseDragged if event.point.x > 0 && event.point.x < size.width && event.point.y > 0 && event.point.y < size.height =>
         if (SwingUtilities.isRightMouseButton(event.peer)) {
-          level.map(event.point.y / 20 * Level.Width + event.point.x / 20) = 0
+          level.map(xytoi(event.point.x, event.point.y)) = 0
         } else {
-          level.map(event.point.y / 20 * Level.Width + event.point.x / 20) = palette.selection.index + 1
+          level.map(xytoi(event.point.x, event.point.y)) = palette.selection.index + 1
         }
         repaint()
     }
@@ -104,39 +101,37 @@ class Editor(projectRoot: Path) extends MainFrame {
     preferredSize = Dimension(Level.Width*20, Level.Height*20)
   }
 
+  private val fileChooser = new FileChooser(projectRoot.resolve("levels").toFile) {
+    fileFilter = new FileNameExtensionFilter("JSON files", "json")
+  }
 
   menuBar = new MenuBar {
     contents ++= Seq(
-      new Menu("File") {
-        contents ++= Seq(
-          new MenuItem(Action("Load level") {
-            val chooser = new FileChooser(projectRoot.resolve("levels").toFile) {
-              fileFilter = new FileNameExtensionFilter("JSON files", "json")
-            }
-            if (chooser.showOpenDialog(mainFrame) == FileChooser.Result.Approve) {
-              loadLevel(chooser.selectedFile)
-            }
-          }),
-          new MenuItem(Action("Save level") {
-            val chooser = new FileChooser(projectRoot.resolve("levels").toFile) {
-              fileFilter = new FileNameExtensionFilter("JSON files", "json")
-            }
-            if (chooser.showSaveDialog(mainFrame) == FileChooser.Result.Approve) {
-              saveLevel(chooser.selectedFile)
-            }
-          })
-        )
-      }
+      new MenuItem(Action("New level") {
+        if (fileChooser.showSaveDialog(mainFrame) == FileChooser.Result.Approve) {
+          level = Level.EmptyLevel
+          saveLevel()
+        }
+      }),
+      new MenuItem(Action("Load level") {
+        if (fileChooser.showOpenDialog(mainFrame) == FileChooser.Result.Approve) {
+          loadLevel(fileChooser.selectedFile)
+        }
+      }),
+      new MenuItem(Action("Save level") {
+        saveLevel()
+      })
     )
   }
 
   def loadLevel(newLevel: File): Unit = {
+    fileChooser.selectedFile = newLevel
     level = Level.load(os.Path(newLevel))
     mainPanel.repaint()
   }
 
-  def saveLevel(destination: File): Unit = {
-    level.write(os.Path(destination))
+  private def saveLevel(): Unit = {
+    level.write(os.Path(fileChooser.selectedFile))
   }
 
   contents = new BorderPanel {

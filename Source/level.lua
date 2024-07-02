@@ -50,6 +50,8 @@ function Level:init(id)
             target = Door(tx, ty, true)
         elseif level.map[link[2] + 1] == HDOOR then
             target = Door(tx, ty, false)
+        else
+            error("Error loading level: unknown link target " .. level.map[link[2] + 1])
         end
 
         local sx, sy = itoxy(link[1])

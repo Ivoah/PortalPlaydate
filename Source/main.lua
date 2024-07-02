@@ -41,7 +41,7 @@ local function loadLevel(id)
     levelSprite:add()
 end
 
-loadLevel(6)
+loadLevel(8)
 
 local menu = playdate.getSystemMenu()
 
@@ -68,7 +68,7 @@ function playdate.update()
     else
         gfx.sprite.update()
     end
-    
+
     if player.x > 360 then
         loadLevel(math.min(currentLevel + 1, 31))
     end
