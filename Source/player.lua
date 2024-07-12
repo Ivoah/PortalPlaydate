@@ -5,6 +5,9 @@ local Point <const> = playdate.geometry.point
 local MAX_X_VELOCITY <const> = 5
 local MAX_Y_VELOCITY <const> = 15
 
+local shoot_blue = playdate.sound.sampleplayer.new("sounds/portal_shoot_blue.wav")
+local shoot_red = playdate.sound.sampleplayer.new("sounds/portal_shoot_red.wav")
+
 class("Player").extends(gfx.sprite)
 
 function Player:init(x, y)
@@ -44,6 +47,8 @@ function Player:collisionResponse(other)
 end
 
 function Player:shootPortal(dir, bluePortal)
+    if bluePortal then shoot_blue:play() else shoot_red:play() end
+    
     local from = Point.new(self:getPosition()) + Vector.new(self:getSize())/2
     local target = from + dir*500
 

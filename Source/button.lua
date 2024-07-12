@@ -1,6 +1,9 @@
 local gfx <const> = playdate.graphics
 local Vector <const> = playdate.geometry.vector2D
 
+local button_down = playdate.sound.sampleplayer.new("sounds/button_down.wav")
+local button_up = playdate.sound.sampleplayer.new("sounds/button_up.wav")
+
 class("Button").extends(gfx.sprite)
 
 function Button:init(x, y, door)
@@ -33,8 +36,16 @@ end
 
 function Button:update()
     local pressed = #self:overlappingSprites() > 0
-    if pressed ~= self.pressed then self:markDirty() end
-    if pressed then self.door:remove() else self.door:add() end
+    if pressed ~= self.pressed then
+        self:markDirty()
+        if pressed then
+            button_down:play()
+            self.door:remove()
+        else
+            button_up:play()
+            self.door:add()
+        end
+    end
     self.pressed = pressed
 end
 
