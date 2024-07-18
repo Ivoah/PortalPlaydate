@@ -4,9 +4,18 @@ local WIDTH <const> = 18
 local HEIGHT <const> = 12
 
 local AIR = 0
+local BUTTON = 5
 local VDOOR = 6
 local HDOOR = 7
-local BUTTON = 5
+local DROPPER = 8
+local FIZZLER1 = 13
+local FIZZLER2 = 14
+local GLASS1 = 21
+local GLASS2 = 22
+local LASER1 = 3
+local LASER2 = 4
+
+local ambient = playdate.sound.sampleplayer.new("sounds/portal_ambient_loop1.wav")
 
 class("Level").extends(gfx.sprite)
 
@@ -16,6 +25,8 @@ end
 
 function Level:init(id)
     Level.super.init(self)
+
+    self.id = id
 
     local level = json.decodeFile("levels/level" .. id .. ".json")
 
@@ -91,6 +102,17 @@ function Level:init(id)
     self:setCenter(0, 0)
     self:setSize(400, 240)
     self:setZIndex(-1)
+
+    self.player = Player(0, (self.entrance - 1)*20)
+
+    table.insert(self.objects, Cube(100, 100))
+
+    local levelSprite = gfx.sprite.spriteWithText("Level " .. id, 100, 10)
+    levelSprite:setImageDrawMode(gfx.kDrawModeNXOR)
+    levelSprite:setScale(2)
+    levelSprite:setCenter(0, 0)
+    levelSprite:moveTo(0, 0)
+    table.insert(self.objects, levelSprite)
 end
 
 function Level:draw()
@@ -109,7 +131,14 @@ end
 function Level:add()
     Level.super.add(self)
 
-    self.mapCollisionSprites = gfx.sprite.addWallSprites(self.tilemap)
+    ambient:play(0)
+
+    self.mapCollisionSprites = gfx.sprite.addWallSprites(self.tilemap, {
+        DROPPER,
+        FIZZLER1, FIZZLER2,
+        GLASS1, GLASS2,
+        LASER1, LASER2
+    })
     for i, sprite in ipairs(self.mapCollisionSprites) do
         sprite:setGroups({GROUP_WALLS})
     end
@@ -117,6 +146,8 @@ function Level:add()
     for i, object in ipairs(self.objects) do
         object:add()
     end
+
+    self.player:add()
 end
 
 function Level:remove()
@@ -124,4 +155,8 @@ function Level:remove()
 
     gfx.sprite.removeSprites(self.objects)
     gfx.sprite.removeSprites(self.mapCollisionSprites)
+
+    self.player:remove()
+
+    ambient:stop()
 end

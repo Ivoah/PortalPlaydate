@@ -6,6 +6,7 @@ import "CoreLibs/ui"
 
 import "utils"
 
+import "menu"
 import "level"
 import "button"
 import "door"
@@ -23,35 +24,12 @@ local gfx <const> = playdate.graphics
 gfx.setFont(gfx.font.new("font/Texas"), gfx.font.kVariantNormal)
 imageTable = gfx.imagetable.new("images/tiles")
 
-local currentLevel
 local level
-local player
-local levelSprite
-local cube
-local function loadLevel(id)
-    currentLevel = id
+function loadLevel(id)
     if level ~= nil then level:remove() end
     level = Level(id)
     level:add()
-
-    if player ~= nil then player:remove() end
-    player = Player(0, (level.entrance - 1)*20)
-    player:add()
-
-    if levelSprite ~= nil then levelSprite:remove() end
-    levelSprite = gfx.sprite.spriteWithText("Level " .. currentLevel, 100, 10)
-    levelSprite:setImageDrawMode(gfx.kDrawModeNXOR)
-    levelSprite:setScale(2)
-    levelSprite:setCenter(0, 0)
-    levelSprite:moveTo(0, 0)
-    levelSprite:add()
-
-    if cube ~= nil then cube:remove() end
-    cube = Cube(100, 100)
-    cube:add()
 end
-
-loadLevel(7)
 
 local menu = playdate.getSystemMenu()
 
@@ -61,11 +39,11 @@ menu:addCheckmarkMenuItem("fly", CHEAT_FLYING, function(value)
 end)
 
 menu:addMenuItem("Next level", function()
-    loadLevel(math.min(currentLevel + 1, 31))
+    loadLevel(math.min(level.id + 1, 31))
 end)
 
 menu:addMenuItem("Previous level", function()
-    loadLevel(math.max(currentLevel - 1, 1))
+    loadLevel(math.max(level.id - 1, 1))
 end)
 
 gfx.sprite.update()
@@ -79,7 +57,10 @@ function playdate.update()
         gfx.sprite.update()
     end
 
-    if player.x > 360 then
-        loadLevel(math.min(currentLevel + 1, 31))
+    if level ~= nil and level.player.x > 360 then
+        loadLevel(math.min(level.id + 1, 31))
     end
 end
+
+loadLevel(25)
+-- Menu():add()

@@ -5,8 +5,8 @@ local Point <const> = playdate.geometry.point
 local MAX_X_VELOCITY <const> = 5
 local MAX_Y_VELOCITY <const> = 15
 
-local shoot_blue = playdate.sound.sampleplayer.new("sounds/portal_shoot_blue.wav")
-local shoot_red = playdate.sound.sampleplayer.new("sounds/portal_shoot_red.wav")
+local shoot_blue = playdate.sound.sampleplayer.new("sounds/portalgun_shoot_blue1.wav")
+local shoot_red = playdate.sound.sampleplayer.new("sounds/portalgun_shoot_red1.wav")
 
 class("Player").extends(gfx.sprite)
 

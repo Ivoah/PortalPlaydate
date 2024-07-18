@@ -1,8 +1,8 @@
 local gfx <const> = playdate.graphics
 local Vector <const> = playdate.geometry.vector2D
 
-local button_down = playdate.sound.sampleplayer.new("sounds/button_down.wav")
-local button_up = playdate.sound.sampleplayer.new("sounds/button_up.wav")
+local button_down = playdate.sound.sampleplayer.new("sounds/portal_button_down_01.wav")
+local button_up = playdate.sound.sampleplayer.new("sounds/portal_button_up_01.wav")
 
 class("Button").extends(gfx.sprite)
 
@@ -19,6 +19,8 @@ function Button:init(x, y, door)
     self:setCollideRect(0, 0, 20, 4)
 
     self:setCollidesWithGroups({GROUP_PHYSICS_OBJECTS})
+
+    self.pressed = false
 end
 
 function Button:add()
