@@ -62,7 +62,7 @@ function Level:init(id)
         elseif level.map[link[2] + 1] == HDOOR then
             target = Door(tx, ty, false)
         else
-            error("Error loading level: unknown link target " .. level.map[link[2] + 1])
+            error("Error loading level: unknown link target: " .. level.map[link[2] + 1])
         end
 
         local sx, sy = itoxy(link[1])
@@ -75,6 +75,13 @@ function Level:init(id)
         level.map[link[2] + 1] = 0
         table.insert(self.objects, source)
         table.insert(self.objects, target)
+    end
+
+    for i=1, #level.map do
+        if level.map[i + 1] == DROPPER then
+            x, y = itoxy(i)
+            table.insert(self.objects, Cube(x + 20/2 - 8/2, y + 20/2 - 8/2))
+        end
     end
 
     self.hasElevator = level.hasElevator
@@ -104,8 +111,6 @@ function Level:init(id)
     self:setZIndex(-1)
 
     self.player = Player(0, (self.entrance - 1)*20)
-
-    table.insert(self.objects, Cube(100, 100))
 
     local levelSprite = gfx.sprite.spriteWithText("Level " .. id, 100, 10)
     levelSprite:setImageDrawMode(gfx.kDrawModeNXOR)
