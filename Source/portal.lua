@@ -58,7 +58,7 @@ function Portal:add()
     end
 
     for i, s in ipairs(self.sides) do
-        s:setGroups({GROUP_WALLS, GROUP_PHYSICS_OBJECTS})
+        s:setGroups({GROUP_WALLS, GROUP_ENTITIES})
     end
 end
 

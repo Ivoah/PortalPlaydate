@@ -11,17 +11,18 @@ import "level"
 import "button"
 import "door"
 import "shot"
+import "entity"
 import "portal"
 import "player"
 import "cube"
 
 GROUP_WALLS = 1
 GROUP_PORTALS = 2
-GROUP_PHYSICS_OBJECTS = 3
+GROUP_ENTITIES = 3
 
 local gfx <const> = playdate.graphics
 
-gfx.setFont(gfx.font.new("font/Texas"), gfx.font.kVariantNormal)
+gfx.setFont(gfx.font.new("fonts/Texas-4x"), gfx.font.kVariantNormal)
 imageTable = gfx.imagetable.new("images/tiles")
 
 local level
@@ -62,5 +63,5 @@ function playdate.update()
     end
 end
 
-loadLevel(25)
--- Menu():add()
+-- loadLevel(25)
+Menu():add()

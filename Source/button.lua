@@ -18,7 +18,7 @@ function Button:init(x, y, door)
 
     self:setCollideRect(0, 0, 20, 4)
 
-    self:setCollidesWithGroups({GROUP_PHYSICS_OBJECTS})
+    self:setCollidesWithGroups({GROUP_ENTITIES})
 
     self.pressed = false
 end

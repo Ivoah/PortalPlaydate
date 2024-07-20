@@ -16,6 +16,7 @@ local LASER1 = 3
 local LASER2 = 4
 
 local ambient = playdate.sound.sampleplayer.new("sounds/portal_ambient_loop1.wav")
+local levelFont = gfx.font.new("fonts/Texas-2x")
 
 class("Level").extends(gfx.sprite)
 
@@ -112,12 +113,12 @@ function Level:init(id)
 
     self.player = Player(0, (self.entrance - 1)*20)
 
-    local levelSprite = gfx.sprite.spriteWithText("Level " .. id, 100, 10)
-    levelSprite:setImageDrawMode(gfx.kDrawModeNXOR)
-    levelSprite:setScale(2)
-    levelSprite:setCenter(0, 0)
-    levelSprite:moveTo(0, 0)
-    table.insert(self.objects, levelSprite)
+    -- local levelSprite = gfx.sprite.spriteWithText("Level " .. id, 100, 10)
+    -- levelSprite:setImageDrawMode(gfx.kDrawModeNXOR)
+    -- levelSprite:setScale(2)
+    -- levelSprite:setCenter(0, 0)
+    -- levelSprite:moveTo(0, 0)
+    -- table.insert(self.objects, levelSprite)
 end
 
 function Level:draw()
@@ -131,6 +132,11 @@ function Level:draw()
     else
         gfx.fillRect(360, (self.exit - 2)*20, 40, 40)
     end
+
+    gfx.pushContext()
+    gfx.setImageDrawMode(gfx.kDrawModeNXOR)
+    levelFont:drawText("Level " .. self.id, 0, 0)
+    gfx.popContext()
 end
 
 function Level:add()
