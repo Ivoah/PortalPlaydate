@@ -13,7 +13,6 @@ function Entity:init(x, y, w, h)
     self:setSize(w, h)
     self:setCollideRect(0, 0, self:getSize())
     self:setGroups({GROUP_ENTITIES})
-    self:setCollidesWithGroups({GROUP_WALLS})
     self:moveTo(x, y)
 
     self.onGround = true
@@ -40,11 +39,11 @@ function Entity:update()
 
     targetPosition.x = math.max(targetPosition.x, 0)
 
-    local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
-
     self.onGround = false
     local inPortal = false
-    self:setCollidesWithGroups({GROUP_WALLS})
+    self:setCollidesWithGroups({GROUP_WALLS, GROUP_PORTALS})
+
+    local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
     for _, c in ipairs(collisions) do
         if c.other:isa(Portal) and self.lastPortal ~= nil and self.lastLastPortal ~= nil then
             inPortal = true

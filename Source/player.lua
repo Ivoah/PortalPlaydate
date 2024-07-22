@@ -16,7 +16,7 @@ function Player:init(x, y)
     self:setSize(20, 20)
     self:setCollideRect(1, 1, 18, 19)
     self:setGroups({GROUP_ENTITIES})
-    self:setCollidesWithGroups({GROUP_WALLS, GROUP_ENTITIES})
+    -- setCollidesWithGroups called in :update method
     self:moveTo(x, y)
 
     self.lastPortal = nil
@@ -164,7 +164,7 @@ function Player:update()
 
     self.onGround = false
     local inPortal = false
-    self:setCollidesWithGroups({GROUP_WALLS, GROUP_ENTITIES})
+    self:setCollidesWithGroups({GROUP_WALLS, GROUP_PORTALS, GROUP_ENTITIES})
     self.ghost:remove()
     for _, c in ipairs(collisions) do
         if c.other:isa(Portal) and self.lastPortal ~= nil and self.lastLastPortal ~= nil then

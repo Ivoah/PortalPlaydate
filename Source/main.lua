@@ -63,5 +63,5 @@ function playdate.update()
     end
 end
 
--- loadLevel(25)
-Menu():add()
+loadLevel(7)
+-- Menu():add()
