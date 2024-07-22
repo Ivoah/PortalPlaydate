@@ -49,13 +49,9 @@ end)
 
 gfx.sprite.update()
 function playdate.update()
-    if (playdate.isCrankDocked()) then
-        gfx.setDitherPattern(0.5, gfx.image.kDitherTypeDiagonalLine)
-        gfx.fillRect(0, 0, 400, 240)
-        gfx.setDitherPattern(0)
+    gfx.sprite.update()
+    if (level ~= nil and playdate.isCrankDocked()) then
         playdate.ui.crankIndicator:draw()
-    else
-        gfx.sprite.update()
     end
 
     if level ~= nil and level.player.x > 360 then
@@ -63,5 +59,5 @@ function playdate.update()
     end
 end
 
-loadLevel(7)
--- Menu():add()
+-- loadLevel(7)
+Menu():add()
