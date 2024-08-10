@@ -25,11 +25,11 @@ local gfx <const> = playdate.graphics
 gfx.setFont(gfx.font.new("fonts/Texas-4x"), gfx.font.kVariantNormal)
 tiles = gfx.imagetable.new("images/tiles")
 
-local level
+current_level = nil
 function loadLevel(id)
-    if level ~= nil then level:remove() end
-    level = Level(id)
-    level:add()
+    if current_level ~= nil then current_level:remove() end
+    current_level = Level(id)
+    current_level:add()
 end
 
 local menu = playdate.getSystemMenu()
@@ -40,11 +40,11 @@ menu:addCheckmarkMenuItem("fly", CHEAT_FLYING, function(value)
 end)
 
 menu:addMenuItem("Next level", function()
-    loadLevel(math.min(level.id + 1, 31))
+    loadLevel(math.min(current_level.id + 1, 31))
 end)
 
 menu:addMenuItem("Previous level", function()
-    loadLevel(math.max(level.id - 1, 1))
+    loadLevel(math.max(current_level.id - 1, 1))
 end)
 
 gfx.sprite.update()
@@ -54,8 +54,8 @@ function playdate.update()
         playdate.ui.crankIndicator:draw()
     end
 
-    if level ~= nil and level.player.x > 360 then
-        loadLevel(math.min(level.id + 1, 31))
+    if current_level ~= nil and current_level.player.x > 360 then
+        loadLevel(math.min(current_level.id + 1, 31))
     end
 end
 

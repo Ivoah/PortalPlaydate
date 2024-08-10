@@ -39,20 +39,21 @@ function Entity:update()
 
     targetPosition.x = math.max(targetPosition.x, 0)
 
+    local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
+
     self.onGround = false
     local inPortal = false
     self:setCollidesWithGroups({GROUP_WALLS, GROUP_PORTALS})
 
-    local _, _, collisions, _ = self:moveWithCollisions(targetPosition)
     for _, c in ipairs(collisions) do
-        if c.other:isa(Portal) and self.lastPortal ~= nil and self.lastLastPortal ~= nil then
+        if c.other:isa(Portal) and current_level.player.lastPortal ~= nil and current_level.player.lastLastPortal ~= nil then
             inPortal = true
             self:setCollidesWithGroups({GROUP_PORTALS})
             local centerOffset = Vector.new(self:getSize())/2
             local center = Point.new(self:getPosition()) + centerOffset
 
             local entryPortal = c.other
-            local exitPortal = entryPortal == self.lastPortal and self.lastLastPortal or self.lastPortal
+            local exitPortal = entryPortal == current_level.player.lastPortal and current_level.player.lastLastPortal or current_level.player.lastPortal
 
             local offset = Vector.new(center.x - entryPortal.x, center.y - entryPortal.y)
             local transform = entryPortal.transform:copy()
