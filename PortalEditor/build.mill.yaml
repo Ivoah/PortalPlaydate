@@ -1,0 +1,5 @@
+extends: ScalaModule
+scalaVersion: 3.3.7
+mvnDeps:
+- org.scala-lang.modules::scala-swing:3.0.0
+- org.scala-lang::toolkit:0.2.0
