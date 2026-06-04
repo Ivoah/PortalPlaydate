@@ -15,7 +15,7 @@ function Menu:init(id)
     self:setSize(400, 240)
     self:setZIndex(-1)
 
-    self.selectedOption = 1
+    self.selectedOption = 2
     self.selectedLevel = nil
 end
 
