@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage
 import scala.swing.event.Key.Modifier
 import javax.swing.SwingUtilities
 import scala.swing.event.{MouseDragged, MouseMoved, MousePressed}
+import scala.reflect.Selectable.reflectiveSelectable
 
 class Editor(projectRoot: Path) extends MainFrame {
   private val mainFrame = this
@@ -30,7 +31,7 @@ class Editor(projectRoot: Path) extends MainFrame {
 
   private val palette = ComboBox(tileset.map(new ImageIcon(_)))
 
-  private val mainPanel = new Panel {
+  private val levelPanel = new Panel {
     extension (p: Point) {
       def -(o: Point): Point = Point(p.x - o.x, p.y - o.y)
     }
@@ -108,6 +109,22 @@ class Editor(projectRoot: Path) extends MainFrame {
     preferredSize = Dimension(Level.Width*20, Level.Height*20)
   }
 
+  private val optionsPanel: BoxPanel {
+    val hasElevator: CheckBox
+    val message: TextArea
+  } = new BoxPanel(Orientation.Vertical) {
+    val hasElevator = new CheckBox("Has elevator")
+    val message = new TextArea() {
+      lineWrap = true
+      wordWrap = true
+    }
+    contents ++= Seq(
+      hasElevator,
+      Label("Message:"),
+      ScrollPane(message)
+    )
+  }
+
   private val fileChooser = new FileChooser(projectRoot.resolve("levels").toFile) {
     fileFilter = new FileNameExtensionFilter("JSON files", "json")
   }
@@ -134,7 +151,7 @@ class Editor(projectRoot: Path) extends MainFrame {
       },
       new MenuItem(Action("Show tile IDs") {
         showTileIds = !showTileIds
-        mainPanel.repaint()
+        levelPanel.repaint()
       })
     )
   }
@@ -142,16 +159,20 @@ class Editor(projectRoot: Path) extends MainFrame {
   def loadLevel(newLevel: File): Unit = {
     fileChooser.selectedFile = newLevel
     level = Level.load(os.Path(newLevel))
-    mainPanel.repaint()
+    optionsPanel.hasElevator.selected = level.hasElevator
+    optionsPanel.message.text = level.message
+    pack()
   }
 
   private def saveLevel(): Unit = {
+    level = level.copy(hasElevator = optionsPanel.hasElevator.selected, message = optionsPanel.message.text)
     level.write(os.Path(fileChooser.selectedFile))
   }
 
   contents = new BorderPanel {
-    layout(mainPanel) = BorderPanel.Position.Center
+    layout(levelPanel) = BorderPanel.Position.Center
     layout(palette) = BorderPanel.Position.South
+    layout(optionsPanel) = BorderPanel.Position.East
   }
 
   title = "Portal Prelude level editor"

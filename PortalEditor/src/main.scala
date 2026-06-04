@@ -8,5 +8,5 @@ def main: Unit = {
   val editor = Editor(Paths.get("../Source"))
   editor.open()
 
-  editor.loadLevel(File("../Source/levels/level7.json").getAbsoluteFile)
+  editor.loadLevel(File("../Source/levels/level1.json").getAbsoluteFile)
 }
