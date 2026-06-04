@@ -23,7 +23,7 @@ GROUP_ENTITIES = 3
 local gfx <const> = playdate.graphics
 
 gfx.setFont(gfx.font.new("fonts/Texas-4x"), gfx.font.kVariantNormal)
-imageTable = gfx.imagetable.new("images/tiles")
+tiles = gfx.imagetable.new("images/tiles")
 
 local level
 function loadLevel(id)

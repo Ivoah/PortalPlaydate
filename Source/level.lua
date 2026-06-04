@@ -104,7 +104,7 @@ function Level:init(id)
     end
 
     self.tilemap = gfx.tilemap.new()
-    self.tilemap:setImageTable(imageTable)
+    self.tilemap:setImageTable(tiles)
     self.tilemap:setTiles(level.map, WIDTH)
 
     self:setCenter(0, 0)

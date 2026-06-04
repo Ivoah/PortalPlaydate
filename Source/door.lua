@@ -7,7 +7,7 @@ function Door:init(x, y, vertical)
     Door.super.init(self)
 
 
-    self:setImage(imageTable:getImage(vertical and 6 or 7, 1))
+    self:setImage(tiles:getImage(vertical and 6 or 7, 1))
     self:setCenter(0, 0)
     self:moveTo(x, y)
 
