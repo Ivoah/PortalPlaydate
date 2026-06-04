@@ -15,6 +15,8 @@ import scala.swing.event.{MouseDragged, MouseMoved, MousePressed}
 class Editor(projectRoot: Path) extends MainFrame {
   private val mainFrame = this
 
+  private var showTileIds = false
+
   val tileset = {
     val tilesetImage = ImageIO.read(projectRoot.resolve("images/tiles-table-20-20.png").toFile)
     (0 until tilesetImage.getHeight by 20).flatMap { y =>
@@ -43,12 +45,17 @@ class Editor(projectRoot: Path) extends MainFrame {
 //      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
       val mouse = MouseInfo.getPointerInfo.getLocation - this.peer.getLocationOnScreen
+      val fontMetrics = peer.getFontMetrics(peer.getFont)
 
-      g.setPaint(Color.BLACK)
       for (x <- 0 until Level.Width; y <- 0 until Level.Height) {
+        g.setPaint(Color.BLACK)
         val tile = level.map(y*Level.Width + x)
         if (tile > 0 && !(mouse.x/20 == x && mouse.y/20 == y && tile - 1 != palette.selection.index && linkInProgress.isEmpty)) {
           g.drawImage(tileset(tile - 1), x*20, y*20, null)
+        }
+        if (showTileIds) {
+          g.setPaint(Color.RED)
+          g.drawString(tile.toString, x*20 + 10 - fontMetrics.stringWidth(tile.toString)/2, y*20 + fontMetrics.getHeight)
         }
       }
 
@@ -107,19 +114,27 @@ class Editor(projectRoot: Path) extends MainFrame {
 
   menuBar = new MenuBar {
     contents ++= Seq(
-      new MenuItem(Action("New level") {
-        if (fileChooser.showSaveDialog(mainFrame) == FileChooser.Result.Approve) {
-          level = Level.EmptyLevel
-          saveLevel()
-        }
-      }),
-      new MenuItem(Action("Load level") {
-        if (fileChooser.showOpenDialog(mainFrame) == FileChooser.Result.Approve) {
-          loadLevel(fileChooser.selectedFile)
-        }
-      }),
-      new MenuItem(Action("Save level") {
-        saveLevel()
+      new Menu("File") {
+        contents ++= Seq(
+          new MenuItem(Action("New level") {
+            if (fileChooser.showSaveDialog(mainFrame) == FileChooser.Result.Approve) {
+              level = Level.EmptyLevel
+              saveLevel()
+            }
+          }),
+          new MenuItem(Action("Load level") {
+            if (fileChooser.showOpenDialog(mainFrame) == FileChooser.Result.Approve) {
+              loadLevel(fileChooser.selectedFile)
+            }
+          }),
+          new MenuItem(Action("Save level") {
+            saveLevel()
+          })
+        )
+      },
+      new MenuItem(Action("Show tile IDs") {
+        showTileIds = !showTileIds
+        mainPanel.repaint()
       })
     )
   }
