@@ -34,7 +34,7 @@ end
 
 local menu = playdate.getSystemMenu()
 
-CHEAT_FLYING = true
+CHEAT_FLYING = false
 menu:addCheckmarkMenuItem("fly", CHEAT_FLYING, function(value)
     CHEAT_FLYING = value
 end)
