@@ -2,16 +2,15 @@ local gfx <const> = playdate.graphics
 local Vector <const> = playdate.geometry.vector2D
 local Point <const> = playdate.geometry.point
 
-local MAX_X_VELOCITY <const> = 5
-local MAX_Y_VELOCITY <const> = 15
+local MAX_VELOCITY <const> = 20
 
 class("Entity").extends(gfx.sprite)
 
-function Entity:init(x, y, w, h)
+function Entity:init(x, y, w, h, cx, cy, cw, ch)
     Entity.super.init(self)
     self:setCenter(0, 0)
     self:setSize(w, h)
-    self:setCollideRect(0, 0, self:getSize())
+    self:setCollideRect(cx or 0, cy or 0, cw or w, ch or h)
     self:setGroups({GROUP_ENTITIES})
     self:moveTo(x, y)
 
@@ -21,19 +20,22 @@ function Entity:init(x, y, w, h)
 end
 
 function Entity:collisionResponse(other)
-	if other:isa(Button) or other:isa(Portal) then
+	if other:isa(Button) or other:isa(Portal) or other:isa(Entity) then
 		return gfx.sprite.kCollisionTypeOverlap
 	end
 
 	return gfx.sprite.kCollisionTypeSlide
 end
 
-function Entity:update()
-    self.velocity.y = math.min(self.velocity.y + 1, MAX_Y_VELOCITY)
+function Entity:update(fx, fy)
+    self.velocity.y += 1
+    self.velocity.x *= (self.onGround and 0.6 or 0.95)
 
-    if self.onGround then
-        self.velocity.x *= 0.6
-    end
+    self.velocity.x = fx or self.velocity.x
+    self.velocity.y = fy or self.velocity.y
+
+    self.velocity.x = math.clampAbs(self.velocity.x, MAX_VELOCITY)
+    self.velocity.y = math.clampAbs(self.velocity.y, MAX_VELOCITY)
 
     local targetPosition = Point.new(self:getPosition()) + self.velocity
 
@@ -43,8 +45,8 @@ function Entity:update()
 
     self.onGround = false
     local inPortal = false
-    self:setCollidesWithGroups({GROUP_WALLS, GROUP_PORTALS})
-
+    self:setCollidesWithGroups({GROUP_WALLS, GROUP_PORTALS, GROUP_ENTITIES})
+    if self.ghost ~= nil then self.ghost:remove() end
     for _, c in ipairs(collisions) do
         if c.other:isa(Portal) and current_level.player.lastPortal ~= nil and current_level.player.lastLastPortal ~= nil then
             inPortal = true
@@ -65,6 +67,11 @@ function Entity:update()
             if entryPortal:getBoundsRect():containsPoint(center) then
                 self:moveTo(exitPoint - centerOffset)
                 self.velocity *= transform
+            end
+
+            if self.ghost ~= nil then
+                self.ghost:moveTo(exitPoint - centerOffset)
+                self.ghost:add()
             end
         elseif c.type == gfx.sprite.kCollisionTypeSlide then
             if c.normal.y ~= 0 and not inPortal then self.velocity.y = 0 end

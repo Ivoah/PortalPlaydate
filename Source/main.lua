@@ -34,7 +34,7 @@ end
 
 local menu = playdate.getSystemMenu()
 
-CHEAT_FLYING = false
+CHEAT_FLYING = true
 menu:addCheckmarkMenuItem("fly", CHEAT_FLYING, function(value)
     CHEAT_FLYING = value
 end)
@@ -50,7 +50,7 @@ end)
 gfx.sprite.update()
 function playdate.update()
     gfx.sprite.update()
-    if (level ~= nil and playdate.isCrankDocked()) then
+    if (current_level ~= nil and playdate.isCrankDocked()) then
         playdate.ui.crankIndicator:draw()
     end
 
@@ -59,5 +59,4 @@ function playdate.update()
     end
 end
 
--- loadLevel(7)
 Menu():add()

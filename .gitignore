@@ -2,7 +2,7 @@
 *.pdx
 *.tiled-session
 .metals/
-.vscode/
 .idea/
 .bsp/
 out/
+venv/

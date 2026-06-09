@@ -1,0 +1,22 @@
+{
+    "files.watcherExclude": {
+        "**/target": true
+    },
+    "Lua.diagnostics.disable": [
+        "undefined-field"
+    ],
+    "Lua.diagnostics.globals": [
+        "playdate",
+        "class",
+
+        "Button",
+        "Cube",
+        "Door",
+        "Entity",
+        "Level",
+        "Menu",
+        "Player",
+        "Portal",
+        "Shot"
+    ]
+}
