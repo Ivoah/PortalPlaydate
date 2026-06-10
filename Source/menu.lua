@@ -41,7 +41,6 @@ function Menu:update()
         elseif self.selectedLevel ~= nil then
             self:remove()
             LevelTransition(self.selectedLevel):add()
-            -- loadLevel(self.selectedLevel)
         end
     end
     if playdate.buttonJustPressed(playdate.kButtonB) then

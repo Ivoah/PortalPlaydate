@@ -86,6 +86,7 @@ function Level:init(id)
     end
 
     self.hasElevator = level.hasElevator
+    self.messages = level.messages
 
     for col=HEIGHT, 1, -1 do
         local t = level.map[(col - 1)*WIDTH + (WIDTH - 1) + 1] -- self.tilemap:getTileAtPosition(WIDTH, col)
@@ -159,6 +160,13 @@ function Level:add()
     end
 
     self.player:add()
+end
+
+function Level:update()
+    if self.player.x > 360 then
+        self:remove()
+        LevelTransition(math.min(self.id + 1, 31)):add()
+    end
 end
 
 function Level:remove()

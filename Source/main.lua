@@ -27,11 +27,6 @@ gfx.setFont(gfx.font.new("fonts/Texas-4x"), gfx.font.kVariantNormal)
 tiles = gfx.imagetable.new("images/tiles")
 
 current_level = nil
-function loadLevel(id)
-    if current_level ~= nil then current_level:remove() end
-    current_level = Level(id)
-    current_level:add()
-end
 
 local menu = playdate.getSystemMenu()
 
@@ -53,13 +48,6 @@ function playdate.update()
     gfx.sprite.update()
     if (current_level ~= nil and playdate.isCrankDocked()) then
         playdate.ui.crankIndicator:draw()
-    end
-
-    if current_level ~= nil and current_level.player.x > 360 then
-        current_level:remove()
-        LevelTransition(math.min(current_level.id + 1, 31)):add()
-        current_level = nil
-        -- loadLevel(math.min(current_level.id + 1, 31))
     end
 end
 
