@@ -1,6 +1,6 @@
 package net.ivoah.portaleditor
 
-case class Level(map: collection.mutable.Seq[Int], links: collection.mutable.Buffer[(Int, Int)], hasElevator: Boolean, message: String) derives upickle.default.ReadWriter {
+case class Level(map: collection.mutable.Seq[Int], links: collection.mutable.Buffer[(Int, Int)], hasElevator: Boolean, messages: Seq[String]) derives upickle.default.ReadWriter {
   // def write(path: os.Path): Unit = os.write.over(path, upickle.default.write(this, indent = 4))
   def write(path: os.Path): Unit = {
     os.write.over(path, s"""{
@@ -11,7 +11,9 @@ case class Level(map: collection.mutable.Seq[Int], links: collection.mutable.Buf
     |${links.map(l => s"[${l._1}, ${l._2}]").map("    " + _).mkString(",\n")}
     |  ],
     |  "hasElevator": ${upickle.default.write(hasElevator)},
-    |  "message": ${upickle.default.write(message)}
+    |  "messages": [
+    |${messages.map(m => s"    ${upickle.default.write(m)}").mkString(",\n")}
+    |  ]
     |}
     |""".stripMargin)
   }
@@ -39,6 +41,6 @@ object Level {
     ),
     scala.collection.mutable.Buffer[(Int, Int)](),
     true,
-    ""
+    Seq()
   )
 }

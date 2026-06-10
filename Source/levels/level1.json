@@ -17,5 +17,9 @@
 
   ],
   "hasElevator": true,
-  "message": "Hey there, I'm Alex.\nYou might be feeling a bit dizzy, but that'll pass shortly.\n\nYou've volunteered, or been volunteered, to take part in our Aperture Science Enrichment test.\nThat thing you're holding lets you create interdimensional portals.\n\nUse the crank to aim and [A] and [B] to shoot them onto the walls, and see if you can get out of this room."
+  "messages": [
+    "Hey there, I'm Alex.\n\nYou might be feeling a bit dizzy, but that'll pass shortly.",
+    "You've volunteered, or been volunteered, to take part in our Aperture Science Enrichment test.\n\nThat thing you're holding lets you create interdimensional portals.",
+    "Use the crank to aim and [A] and [B] to shoot them onto the walls, and see if you can get out of this room."
+  ]
 }

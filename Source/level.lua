@@ -3,20 +3,20 @@ local gfx <const> = playdate.graphics
 local WIDTH <const> = 18
 local HEIGHT <const> = 12
 
-local AIR = 0
-local BUTTON = 5
-local VDOOR = 6
-local HDOOR = 7
-local DROPPER = 8
-local FIZZLER1 = 13
-local FIZZLER2 = 14
-local GLASS1 = 21
-local GLASS2 = 22
-local LASER1 = 3
-local LASER2 = 4
+local AIR <const> = 0
+local BUTTON <const> = 5
+local VDOOR <const> = 6
+local HDOOR <const> = 7
+local DROPPER <const> = 8
+local FIZZLER1 <const> = 13
+local FIZZLER2 <const> = 14
+local GLASS1 <const> = 21
+local GLASS2 <const> = 22
+local LASER1 <const> = 3
+local LASER2 <const> = 4
 
-local ambient = playdate.sound.sampleplayer.new("sounds/portal_ambient_loop1.wav")
-local levelFont = gfx.font.new("fonts/Texas-2x")
+local ambient <const> = playdate.sound.sampleplayer.new("sounds/portal_ambient_loop1.wav")
+local levelFont <const> = gfx.font.new("fonts/Texas-2x")
 
 class("Level").extends(gfx.sprite)
 

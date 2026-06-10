@@ -1,14 +1,16 @@
 local gfx <const> = playdate.graphics
 
-local radio = playdate.sound.sampleplayer.new("sounds/looping_radio_mix.wav")
-local background = gfx.image.new("images/menu.png")
-local selector = gfx.image.new("images/menuSelector.png")
+local radio <const> = playdate.sound.sampleplayer.new("sounds/looping_radio_mix.wav")
+local shoot_blue <const> = playdate.sound.sampleplayer.new("sounds/portalgun_shoot_blue1.wav")
+local shoot_red <const> = playdate.sound.sampleplayer.new("sounds/portalgun_shoot_red1.wav")
+local background <const> = gfx.image.new("images/menu")
+local selector <const> = gfx.image.new("images/menuSelector")
 
-local menuLocations = {4, 40, 77}
+local menuLocations <const> = {4, 40, 77}
 
 class("Menu").extends(gfx.sprite)
 
-function Menu:init(id)
+function Menu:init()
     Menu.super.init(self)
 
     self:setCenter(0, 0)
@@ -22,9 +24,9 @@ end
 function Menu:draw()
     background:drawScaled(0, 0, 4)
 
-    selector:drawScaled(menuLocations[self.selectedOption]*4, 48*4, 4)
-
-    if self.selectedLevel ~= nil then
+    if self.selectedLevel == nil then
+        selector:drawScaled(menuLocations[self.selectedOption]*4, 48*4, 4)
+    else
         gfx.setColor(gfx.kColorWhite)
         gfx.fillRect(41*4, 29*4, 18*4, 15*4)
         gfx.drawText(string.format("<%02d>", self.selectedLevel), 170, (28+6)*4)
@@ -38,7 +40,8 @@ function Menu:update()
             self:markDirty()
         elseif self.selectedLevel ~= nil then
             self:remove()
-            loadLevel(self.selectedLevel)
+            LevelTransition(self.selectedLevel):add()
+            -- loadLevel(self.selectedLevel)
         end
     end
     if playdate.buttonJustPressed(playdate.kButtonB) then

@@ -17,5 +17,7 @@
 
   ],
   "hasElevator": true,
-  "message": "Great job.\nAs you've probably noticed, portals can let you move around a bit quicker than walking.\nStill, you can't put them on all the walls in our test chambers."
+  "messages": [
+    "Great job.\n\nAs you've probably noticed, portals can let you move around a bit quicker than walking.\n\nStill, you can't put them on all the walls in our test chambers."
+  ]
 }

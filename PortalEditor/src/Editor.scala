@@ -120,7 +120,7 @@ class Editor(projectRoot: Path) extends MainFrame {
     }
     contents ++= Seq(
       hasElevator,
-      Label("Message:"),
+      Label("Messages:"),
       ScrollPane(message)
     )
   }
@@ -160,19 +160,19 @@ class Editor(projectRoot: Path) extends MainFrame {
     fileChooser.selectedFile = newLevel
     level = Level.load(os.Path(newLevel))
     optionsPanel.hasElevator.selected = level.hasElevator
-    optionsPanel.message.text = level.message
+    optionsPanel.message.text = level.messages.mkString("|")
     pack()
   }
 
   private def saveLevel(): Unit = {
-    level = level.copy(hasElevator = optionsPanel.hasElevator.selected, message = optionsPanel.message.text)
+    level = level.copy(hasElevator = optionsPanel.hasElevator.selected, messages = optionsPanel.message.text.split("|"))
     level.write(os.Path(fileChooser.selectedFile))
   }
 
   contents = new BorderPanel {
-    layout(levelPanel) = BorderPanel.Position.Center
+    layout(levelPanel) = BorderPanel.Position.West
+    layout(optionsPanel) = BorderPanel.Position.Center
     layout(palette) = BorderPanel.Position.South
-    layout(optionsPanel) = BorderPanel.Position.East
   }
 
   title = "Portal Prelude level editor"

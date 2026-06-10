@@ -8,6 +8,7 @@ import "utils"
 
 import "menu"
 import "level"
+import "LevelTransition"
 import "button"
 import "door"
 import "shot"
@@ -55,7 +56,10 @@ function playdate.update()
     end
 
     if current_level ~= nil and current_level.player.x > 360 then
-        loadLevel(math.min(current_level.id + 1, 31))
+        current_level:remove()
+        LevelTransition(math.min(current_level.id + 1, 31)):add()
+        current_level = nil
+        -- loadLevel(math.min(current_level.id + 1, 31))
     end
 end
 
