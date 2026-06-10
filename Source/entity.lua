@@ -48,14 +48,14 @@ function Entity:update(fx, fy)
     self:setCollidesWithGroups({GROUP_WALLS, GROUP_PORTALS, GROUP_ENTITIES})
     if self.ghost ~= nil then self.ghost:remove() end
     for _, c in ipairs(collisions) do
-        if c.other:isa(Portal) and current_level.player.lastPortal ~= nil and current_level.player.lastLastPortal ~= nil then
+        if c.other:isa(Portal) and c.other.linkedPortal ~= nil then
             inPortal = true
             self:setCollidesWithGroups({GROUP_PORTALS})
             local centerOffset = Vector.new(self:getSize())/2
             local center = Point.new(self:getPosition()) + centerOffset
 
             local entryPortal = c.other
-            local exitPortal = entryPortal == current_level.player.lastPortal and current_level.player.lastLastPortal or current_level.player.lastPortal
+            local exitPortal = c.other.linkedPortal
 
             local offset = Vector.new(center.x - entryPortal.x, center.y - entryPortal.y)
             local transform = entryPortal.transform:copy()

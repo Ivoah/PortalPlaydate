@@ -143,6 +143,8 @@ end
 function Level:add()
     Level.super.add(self)
 
+    current_level = self
+
     ambient:play(0)
 
     self.mapCollisionSprites = gfx.sprite.addWallSprites(self.tilemap, {

@@ -15,8 +15,8 @@ class("Player").extends(Entity)
 function Player:init(x, y)
     Player.super.init(self, x, y, 20, 20, 1, 1, 18, 19)
 
-    self.lastPortal = nil
-    self.lastLastPortal = nil
+    self.bluePortal = nil
+    self.redPortal = nil
 
     self.carrying = nil
 
@@ -48,20 +48,17 @@ function Player:shootPortal(dir, bluePortal)
         if hits[1].normal.x < 0 then hitX += 1 end
         if hits[1].normal.y < 0 then hitY += 1 end
 
-        -- if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
-        -- if self.lastPortal ~= nil then self.lastPortal.fast = false end
-        -- self.lastLastPortal = self.lastPortal
-        -- self.lastPortal = Portal(hitX, hitY, hits[1].normal)
-        -- self.lastPortal:add()
         local newPortal = Portal(hitX, hitY, hits[1].normal)
+        newPortal.fast = bluePortal
+        newPortal.linkedPortal = bluePortal and self.redPortal or self.bluePortal
         if bluePortal then
-            if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
-            newPortal.fast = true
-            self.lastLastPortal = newPortal
+            if self.redPortal ~= nil then self.redPortal.linkedPortal = newPortal end
+            if self.bluePortal ~= nil then self.bluePortal:remove() end
+            self.bluePortal = newPortal
         else
-            if self.lastPortal ~= nil then self.lastPortal:remove() end
-            newPortal.fast = false
-            self.lastPortal = newPortal
+            if self.bluePortal ~= nil then self.bluePortal.linkedPortal = newPortal end
+            if self.redPortal ~= nil then self.redPortal:remove() end
+            self.redPortal = newPortal
         end
         newPortal:add()
     end
@@ -142,6 +139,6 @@ end
 function Player:remove()
     Player.super.remove(self)
 
-    if self.lastLastPortal ~= nil then self.lastLastPortal:remove() end
-    if self.lastPortal ~= nil then self.lastPortal:remove() end
+    if self.bluePortal ~= nil then self.bluePortal:remove() end
+    if self.redPortal ~= nil then self.redPortal:remove() end
 end

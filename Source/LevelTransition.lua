@@ -15,6 +15,11 @@ function LevelTransition:init(id)
     self:setSize(400, 240)
 end
 
+function LevelTransition:add()
+    LevelTransition.super.add(self)
+    current_level = self
+end
+
 function LevelTransition:draw()
     gfx.setColor(gfx.kColorBlack)
     gfx.fillRect(0, 0, 400, 240)
@@ -33,8 +38,7 @@ function LevelTransition:update()
         self.message += 1
         if self.message > #self.level.messages then
             self:remove()
-            current_level = self.level
-            current_level:add()
+            self.level:add()
         end
         self:markDirty()
     end

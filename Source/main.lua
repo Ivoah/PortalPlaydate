@@ -36,11 +36,17 @@ menu:addCheckmarkMenuItem("fly", CHEAT_FLYING, function(value)
 end)
 
 menu:addMenuItem("Next level", function()
-    loadLevel(math.min(current_level.id + 1, 31))
+    if current_level ~= nil then
+        current_level:remove()
+        LevelTransition(math.min(current_level.id + 1, 31)):add()
+    end
 end)
 
 menu:addMenuItem("Previous level", function()
-    loadLevel(math.max(current_level.id - 1, 1))
+    if current_level ~= nil then
+        current_level:remove()
+        LevelTransition(math.max(current_level.id - 1, 1)):add()
+    end
 end)
 
 gfx.sprite.update()
