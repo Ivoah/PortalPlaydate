@@ -52,7 +52,7 @@ end)
 gfx.sprite.update()
 function playdate.update()
     gfx.sprite.update()
-    if (current_level ~= nil and playdate.isCrankDocked()) then
+    if current_level ~= nil and current_level.player ~= nil and playdate.isCrankDocked() then
         playdate.ui.crankIndicator:draw()
     end
 end
