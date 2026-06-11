@@ -39,7 +39,7 @@ function Player:shootPortal(dir, bluePortal)
     bullet:setCollideRect(0, 0, 1, 1)
     bullet:setCollidesWithGroups({GROUP_WALLS})
     bullet:add()
-    local hitX, hitY, hits, nHits = bullet:moveWithCollisions(target)
+    local hitX, hitY, hits, nHits = bullet:checkCollisions(target)
     bullet:remove()
 
     Shot(from, Point.new(hitX, hitY)):add()
@@ -50,14 +50,15 @@ function Player:shootPortal(dir, bluePortal)
 
         local newPortal = Portal(hitX, hitY, hits[1].normal)
         newPortal.fast = bluePortal
-        newPortal.linkedPortal = bluePortal and self.redPortal or self.bluePortal
         if bluePortal then
             if self.redPortal ~= nil then self.redPortal.linkedPortal = newPortal end
             if self.bluePortal ~= nil then self.bluePortal:remove() end
+            newPortal.linkedPortal = self.redPortal
             self.bluePortal = newPortal
         else
             if self.bluePortal ~= nil then self.bluePortal.linkedPortal = newPortal end
             if self.redPortal ~= nil then self.redPortal:remove() end
+            newPortal.linkedPortal = self.bluePortal
             self.redPortal = newPortal
         end
         newPortal:add()
