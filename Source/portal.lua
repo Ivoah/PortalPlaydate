@@ -7,11 +7,11 @@ local PORTAL_HEIGHT <const> = 8*4
 
 class("Portal").extends(gfx.sprite)
 
-function Portal:init(x, y, normal)
+function Portal:init(x, y, normal, fast)
     Portal.super.init(self)
 
     self.offset = 0
-    self.fast = true
+    self.fast = fast
     self.normal = normal
     self.transform = playdate.geometry.affineTransform.new()
 

@@ -48,8 +48,7 @@ function Player:shootPortal(dir, bluePortal)
         if hits[1].normal.x < 0 then hitX += 1 end
         if hits[1].normal.y < 0 then hitY += 1 end
 
-        local newPortal = Portal(hitX, hitY, hits[1].normal)
-        newPortal.fast = bluePortal
+        local newPortal = Portal(hitX, hitY, hits[1].normal, bluePortal)
         if bluePortal then
             if self.redPortal ~= nil then self.redPortal.linkedPortal = newPortal end
             if self.bluePortal ~= nil then self.bluePortal:remove() end
